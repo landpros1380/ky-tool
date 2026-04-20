@@ -538,6 +538,8 @@ window.onload=function(){
   document.getElementById('filterMonth').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   updateUnsentBadge();
   checkBackupReminder();
+  // 起動時にマスター自動同期（GAS URLが登録済みの場合のみ）
+  autoSyncMaster();
 };
 
 // ===== LOAD ALL MASTERS =====
@@ -563,6 +565,67 @@ function saveMasters(){
   localStorage.setItem(KEY.workers,JSON.stringify(workers));
   localStorage.setItem(KEY.workTypes,JSON.stringify(workTypes));
   localStorage.setItem(KEY.equips,JSON.stringify(equips));
+}
+
+// ===== 起動時マスター自動同期 =====
+function autoSyncMaster(){
+  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+  if(!gasUrl) return; // URL未登録なら何もしない
+
+  // 前回同期から10分以上経過していれば同期する
+  const lastSync=parseInt(localStorage.getItem('ky_lastAutoSync')||'0');
+  const now=Date.now();
+  if(now - lastSync < 10*60*1000) return; // 10分以内は skip
+
+  // バナーを表示
+  showSyncBanner('⏳ 現場・作業員リストを更新中…');
+
+  fetch(gasUrl+'?action=getMaster')
+    .then(res=>res.json())
+    .then(json=>{
+      if(json.status!=='ok') throw new Error(json.msg||'error');
+      let changed=false;
+      if(json.sites&&json.sites.length>0){
+        sites=json.sites;
+        localStorage.setItem(KEY.sites,JSON.stringify(sites));
+        rebuildSiteSelect();
+        changed=true;
+      }
+      if(json.workers&&json.workers.length>0){
+        workers=json.workers;
+        localStorage.setItem(KEY.workers,JSON.stringify(workers));
+        rebuildLeaderSelect();
+        rebuildWorkerSelect();
+        changed=true;
+      }
+      localStorage.setItem('ky_lastAutoSync', String(Date.now()));
+      if(changed){
+        showSyncBanner('✅ リスト更新完了！');
+      } else {
+        hideSyncBanner();
+      }
+      setTimeout(hideSyncBanner, 3000);
+    })
+    .catch(()=>{
+      // 自動同期は失敗しても無視（手動で設定タブから実行可能）
+      hideSyncBanner();
+    });
+}
+
+function showSyncBanner(msg){
+  let banner=document.getElementById('syncBanner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='syncBanner';
+    banner.style.cssText='position:fixed;top:60px;left:0;right:0;background:#1a1a1a;color:#FFD600;text-align:center;padding:8px;font-size:12px;font-weight:700;z-index:300;letter-spacing:0.04em;';
+    document.body.appendChild(banner);
+  }
+  banner.textContent=msg;
+  banner.style.display='block';
+}
+function hideSyncBanner(){
+  const b=document.getElementById('syncBanner');
+  if(b) b.style.display='none';
 }
 
 // ===== PAGE SWITCH =====

@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>KY活動記録ツール</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+:root{--yellow:#FFD600;--dark:#1a1a1a;--orange:#FF6B00;--border:#e0e0e0;--sub:#666;--green:#00A651;--red:#D32F2F;--bg:#f7f7f7;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100vh;color:var(--dark);}
+
+/* HEADER */
+.header{background:var(--yellow);padding:12px 16px 10px;position:sticky;top:0;z-index:200;border-bottom:4px solid var(--orange);display:flex;align-items:center;gap:10px;}
+.header-icon{width:36px;height:36px;background:var(--dark);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.header-titles h1{font-size:17px;font-weight:900;color:var(--dark);letter-spacing:0.04em;line-height:1.2;}
+.header-titles p{font-size:10px;color:#555;font-weight:500;}
+.header-actions{margin-left:auto;display:flex;gap:5px;}
+.btn-hdr{background:var(--dark);color:var(--yellow);border:none;border-radius:8px;padding:7px 10px;font-size:11px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-hdr:active{opacity:0.8;}
+.btn-hdr.active-tab{background:var(--orange);color:#fff;}
+
+/* PAGES */
+.page{display:none;}.page.active{display:block;}
+
+/* LAYOUT */
+.main{padding:14px;max-width:600px;margin:0 auto;}
+
+/* PROGRESS */
+.progress-bar{background:#333;border-radius:4px;height:6px;margin-bottom:14px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:4px;transition:width 0.4s;width:0%;}
+.progress-label{font-size:11px;color:#aaa;text-align:right;margin-top:4px;margin-bottom:14px;}
+
+/* CARD */
+.card{background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.card-header{display:flex;align-items:center;gap:10px;padding:13px 16px 11px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+.card-header:active{background:#f5f5f5;}
+.card-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;background:var(--yellow);color:var(--dark);}
+.card-num.done{background:var(--green);color:#fff;}
+.card-title{font-size:15px;font-weight:700;flex:1;}
+.card-subtitle{font-size:11px;color:var(--sub);font-weight:400;}
+.card-chevron{font-size:13px;color:#aaa;transition:transform 0.2s;}
+.card-chevron.open{transform:rotate(90deg);}
+.card-body{padding:0 16px 16px;border-top:1px solid var(--border);display:none;}
+.card-body.open{display:block;}
+
+/* FORM */
+.field{margin-top:14px;}
+label{display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
+.req{color:var(--red);margin-left:3px;}
+input[type="text"],input[type="date"],select,textarea{width:100%;border:2px solid var(--border);border-radius:10px;padding:11px 14px;font-size:16px;font-family:inherit;color:var(--dark);background:#fff;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.add-row{display:none;gap:8px;margin-top:8px;}
+.add-row input{flex:1;}
+.btn-inline-add{background:var(--dark);color:var(--yellow);border:none;border-radius:10px;padding:0 16px;font-size:22px;cursor:pointer;font-family:inherit;flex-shrink:0;line-height:1;}
+.btn-inline-add:active{opacity:0.8;}
+
+/* TAGS */
+.tag-container{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.tag{background:var(--yellow);color:var(--dark);border-radius:20px;padding:6px 12px 6px 14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;}
+.tag-x{background:var(--dark);color:var(--yellow);border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;flex-shrink:0;}
+
+/* WORKER */
+.worker-check-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background 0.1s;}
+.worker-check-item:last-child{border-bottom:none;}
+.worker-check-item:active{background:var(--bg);}
+.worker-check-item.checked{background:#FFFDE7;}
+.wc-box{width:22px;height:22px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.wc-box.on{background:var(--dark);border-color:var(--dark);}
+.wc-mark{width:10px;height:6px;border-left:2px solid var(--yellow);border-bottom:2px solid var(--yellow);transform:rotate(-45deg) translateY(-1px);display:none;}
+.wc-box.on .wc-mark{display:block;}
+.wc-name{font-size:16px;color:var(--dark);flex:1;}
+.worker-empty{padding:14px;font-size:13px;color:var(--sub);text-align:center;}
+
+/* RISK */
+.risk-list{margin-top:10px;}
+.risk-row{background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:10px;border-left:4px solid var(--orange);}
+.risk-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.risk-row-num{font-size:13px;font-weight:900;color:var(--orange);}
+.btn-rm-risk{background:none;border:none;color:#bbb;font-size:18px;cursor:pointer;font-family:inherit;line-height:1;padding:0;}
+.risk-sub{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.08em;margin:0 0 5px;text-transform:uppercase;}
+.risk-gap{margin-top:10px;}
+.risk-row textarea{min-height:72px;font-size:15px;}
+.risk-level{display:flex;gap:6px;margin-top:10px;}
+.rl-btn{flex:1;padding:8px 4px;border-radius:8px;border:2px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;transition:all 0.15s;}
+.rl-btn.low.active{background:var(--green);color:#fff;border-color:var(--green);}
+.rl-btn.mid.active{background:var(--orange);color:#fff;border-color:var(--orange);}
+.rl-btn.high.active{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-add-risk{width:100%;background:transparent;border:2px dashed var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:4px;}
+.btn-add-risk:active{background:#f5f5f5;}
+.info-box{background:#FFF8E1;border-radius:8px;padding:10px 12px;font-size:12px;color:#7B5800;margin-top:10px;line-height:1.7;border-left:3px solid var(--yellow);}
+
+/* PPE */
+.ppe-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.ppe-btn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;transition:all 0.15s;}
+.ppe-btn.on{background:var(--dark);border-color:var(--dark);color:var(--yellow);}
+
+/* SUBMIT BUTTONS */
+.btn-submit{width:100%;background:linear-gradient(135deg,var(--yellow),var(--orange));color:var(--dark);border:none;border-radius:16px;padding:18px;font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:0.05em;box-shadow:0 4px 20px rgba(255,107,0,.4);margin-bottom:8px;transition:transform 0.1s;}
+.btn-submit:active{transform:scale(0.98);}
+.btn-sheets{width:100%;background:#1a73e8;color:#fff;border:none;border-radius:16px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:0.04em;margin-bottom:8px;}
+.btn-sheets:active{opacity:0.85;}
+.btn-sheets:disabled{background:#aaa;cursor:not-allowed;}
+.btn-reset{width:100%;background:transparent;border:2px solid #555;border-radius:16px;padding:14px;font-size:14px;font-weight:700;color:#aaa;cursor:pointer;font-family:inherit;margin-bottom:8px;}
+.btn-danger{width:100%;background:transparent;border:2px solid var(--red);border-radius:16px;padding:12px;font-size:13px;font-weight:700;color:var(--red);cursor:pointer;font-family:inherit;margin-bottom:8px;opacity:0.7;}
+
+/* PREVIEW */
+#preview-panel{display:none;background:#fff;border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.preview-title{font-size:19px;font-weight:900;text-align:center;border-bottom:4px solid var(--yellow);padding-bottom:12px;margin-bottom:16px;letter-spacing:0.1em;}
+.preview-section{margin-bottom:14px;}
+.preview-section h3{font-size:12px;font-weight:900;color:#fff;background:var(--dark);padding:4px 12px;border-radius:6px;margin-bottom:8px;display:inline-block;}
+.pt{width:100%;border-collapse:collapse;font-size:13px;}
+.pt th{background:#f5f5f5;text-align:left;padding:7px 10px;font-weight:700;border:1px solid var(--border);width:30%;vertical-align:top;}
+.pt td{padding:7px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5;}
+.rb{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;}
+.rb.low{background:var(--green);}.rb.mid{background:var(--orange);}.rb.high{background:var(--red);}
+
+/* LIST PAGE */
+.list-page{padding:14px;max-width:600px;margin:0 auto;}
+.list-filter{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.list-filter select,.list-filter input[type="month"]{flex:1;min-width:120px;border:2px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--dark);background:#fff;outline:none;-webkit-appearance:none;}
+.list-filter select:focus,.list-filter input:focus{border-color:var(--orange);}
+.list-summary{display:flex;gap:8px;margin-bottom:14px;}
+.summary-card{flex:1;background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.1);}
+.summary-card .s-num{font-size:24px;font-weight:900;color:var(--orange);line-height:1;}
+.summary-card .s-label{font-size:10px;color:var(--sub);font-weight:700;margin-top:3px;letter-spacing:0.06em;}
+.record-card{background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.record-card-header{padding:14px 16px 12px;display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.record-card-header:active{background:#f5f5f5;}
+.record-date-badge{background:var(--dark);color:var(--yellow);border-radius:10px;padding:6px 10px;text-align:center;flex-shrink:0;min-width:54px;}
+.record-date-badge .r-month{font-size:10px;font-weight:700;line-height:1;}
+.record-date-badge .r-day{font-size:22px;font-weight:900;line-height:1.1;}
+.record-date-badge .r-dow{font-size:10px;font-weight:700;line-height:1.2;}
+.record-info{flex:1;min-width:0;}
+.record-site{font-size:14px;font-weight:900;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.record-meta{font-size:12px;color:var(--sub);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.record-badges{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.record-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--bg);color:var(--sub);}
+.record-badge.has-high{background:#FFEBEE;color:var(--red);}
+.record-badge.has-mid{background:#FFF3E0;color:var(--orange);}
+.record-chevron{font-size:13px;color:#ccc;flex-shrink:0;}
+.record-detail{display:none;border-top:1px solid var(--border);}
+.record-detail.open{display:block;}
+.record-detail-inner{padding:16px;}
+.detail-section{margin-bottom:14px;}
+.detail-section:last-child{margin-bottom:0;}
+.detail-section-title{font-size:11px;font-weight:900;color:#fff;background:var(--dark);padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:8px;letter-spacing:0.06em;}
+.detail-table{width:100%;border-collapse:collapse;font-size:13px;}
+.detail-table th{background:#f5f5f5;text-align:left;padding:6px 10px;font-weight:700;border:1px solid var(--border);width:32%;vertical-align:top;}
+.detail-table td{padding:6px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5;}
+.detail-risk-block{background:var(--bg);border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--orange);}
+.detail-risk-block:last-child{margin-bottom:0;}
+.detail-risk-label{font-size:11px;font-weight:700;color:var(--orange);margin-bottom:4px;}
+.detail-risk-danger{font-size:13px;color:var(--dark);line-height:1.5;}
+.detail-risk-measure{font-size:12px;color:#444;background:#fff;border-radius:6px;padding:5px 8px;margin-top:5px;line-height:1.5;}
+.record-actions{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:#fafafa;}
+.btn-rec-print{flex:1;background:var(--dark);color:var(--yellow);border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-rec-edit{flex:1;background:var(--yellow);color:var(--dark);border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-rec-delete{background:transparent;border:2px solid #eee;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#ccc;}
+.list-empty{text-align:center;padding:48px 16px;color:#888;}
+.list-empty .empty-icon{font-size:48px;margin-bottom:12px;}
+.list-empty p{font-size:14px;line-height:1.7;}
+
+/* ===== SETTINGS PAGE ===== */
+.settings-page{padding:14px;max-width:600px;margin:0 auto;}
+.settings-section{background:#fff;border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.settings-section-header{background:var(--dark);padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.settings-section-header .s-icon{font-size:18px;}
+.settings-section-header h2{font-size:14px;font-weight:900;color:var(--yellow);letter-spacing:0.05em;flex:1;}
+.settings-section-body{padding:16px;}
+.settings-item-list{margin-bottom:12px;}
+.settings-item{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border-radius:10px;margin-bottom:6px;}
+.settings-item span{flex:1;font-size:15px;color:var(--dark);}
+.settings-item .item-order{display:flex;gap:4px;}
+.btn-item-up,.btn-item-down{background:#fff;border:2px solid var(--border);border-radius:6px;width:28px;height:28px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:var(--sub);}
+.btn-item-up:active,.btn-item-down:active{background:#f0f0f0;}
+.btn-item-del{background:transparent;border:2px solid #ffcdd2;border-radius:6px;width:28px;height:28px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:var(--red);}
+.btn-item-del:active{background:#ffebee;}
+.settings-add-row{display:flex;gap:8px;}
+.settings-add-row input{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:16px;font-family:inherit;color:var(--dark);outline:none;-webkit-appearance:none;}
+.settings-add-row input:focus{border-color:var(--orange);}
+.btn-settings-add{background:var(--dark);color:var(--yellow);border:none;border-radius:10px;padding:0 18px;font-size:22px;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.btn-settings-add:active{opacity:0.8;}
+.settings-hint{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.6;}
+.settings-reset-btn{width:100%;background:transparent;border:2px dashed var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:8px;}
+
+/* 送信済み・未送信バッジ */
+.sent-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px;}
+.sent-badge.sent{background:#E8F5E9;color:#2E7D32;}
+.sent-badge.unsent{background:#FFF3E0;color:#E65100;}
+.record-card.unsent-card{border-left:3px solid var(--orange);}
+
+/* テンプレートモーダル */
+.tpl-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:flex-end;pointer-events:none;visibility:hidden;}
+.tpl-overlay.open{pointer-events:auto;visibility:visible;}
+.tpl-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px 16px 32px;}
+.tpl-title{font-size:16px;font-weight:900;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.tpl-close{background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;padding:0;line-height:1;}
+.tpl-item{background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;border-left:3px solid var(--orange);}
+.tpl-item:active{background:#ffe0cc;}
+.tpl-item-date{font-size:10px;color:var(--sub);margin-bottom:4px;font-weight:700;}
+.tpl-item-danger{font-size:13px;color:var(--dark);line-height:1.5;}
+.tpl-item-measure{font-size:12px;color:#555;margin-top:4px;}
+.tpl-empty{text-align:center;padding:32px;color:#aaa;font-size:13px;}
+
+/* A4印刷レイアウト */
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .header,.progress-bar,.progress-label,.card,.btn-submit,.btn-sheets,.btn-reset,.btn-danger,
+  #page-list,#page-settings,.toast{display:none!important;}
+  #preview-panel{display:block!important;box-shadow:none;padding:0;margin:0;border-radius:0;}
+  body{background:#fff;font-family:'Noto Sans JP',sans-serif;}
+  .print-page{width:210mm;min-height:297mm;margin:0 auto;padding:15mm 15mm 20mm;box-sizing:border-box;}
+  .print-header{display:flex!important;align-items:center;border-bottom:3px solid #1a1a1a;padding-bottom:10px;margin-bottom:14px;}
+  .print-logo{background:#1a1a1a;color:#FFD600;font-size:18px;font-weight:900;padding:6px 14px;border-radius:6px;margin-right:14px;letter-spacing:0.05em;}
+  .print-title{font-size:20px;font-weight:900;letter-spacing:0.08em;flex:1;}
+  .print-date-box{font-size:12px;color:#444;text-align:right;}
+  .print-section{margin-bottom:12px;}
+  .print-section-title{background:#1a1a1a;color:#FFD600;font-size:11px;font-weight:900;padding:3px 10px;display:inline-block;letter-spacing:0.08em;margin-bottom:6px;}
+  .print-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .print-table th{background:#f0f0f0;text-align:left;padding:5px 8px;font-weight:700;border:1px solid #ccc;width:28%;vertical-align:top;}
+  .print-table td{padding:5px 8px;border:1px solid #ccc;vertical-align:top;line-height:1.5;}
+  .print-risk-block{border:1px solid #ccc;border-radius:6px;padding:8px 10px;margin-bottom:6px;page-break-inside:avoid;}
+  .print-risk-num{font-size:11px;font-weight:700;color:#FF6B00;margin-bottom:4px;}
+  .print-risk-danger{font-size:12px;margin-bottom:4px;}
+  .print-risk-measure{font-size:11px;background:#f5f5f5;padding:4px 8px;border-radius:4px;}
+  .print-sign{display:flex!important;gap:16px;margin-top:16px;}
+  .print-sign-box{flex:1;border:1px solid #ccc;border-radius:6px;padding:10px;text-align:center;}
+  .print-sign-label{font-size:10px;color:#666;margin-bottom:20px;}
+  .print-sign-line{border-top:1px solid #ccc;margin-top:10px;padding-top:4px;font-size:10px;color:#999;}
+  .rb-print-low{color:#00A651;font-weight:700;}
+  .rb-print-mid{color:#FF6B00;font-weight:700;}
+  .rb-print-high{color:#D32F2F;font-weight:700;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-icon">⚠️</div>
+  <div class="header-titles">
+    <h1>KY活動記録</h1>
+    <p>危険予知・安全確認ツール</p>
+  </div>
+  <div class="header-actions">
+    <button class="btn-hdr active-tab" id="tab-form-btn" onclick="showPage('form')">✏️ 入力</button>
+    <button class="btn-hdr" id="tab-list-btn" onclick="showPage('list')">📋 一覧</button>
+    <button class="btn-hdr" id="tab-settings-btn" onclick="showPage('settings')">⚙️ 設定</button>
+  </div>
+</div>
+
+<!-- ===== 入力ページ ===== -->
+<div class="page active" id="page-form">
+<div class="main">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 4 セクション入力済み</div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(1)">
+      <div class="card-num" id="num1">1</div>
+      <div><div class="card-title">📅 基本情報</div><div class="card-subtitle">日付・現場・天候</div></div>
+      <div class="card-chevron open" id="chev1">▶</div>
+    </div>
+    <div class="card-body open" id="body1">
+      <div class="field"><label>作業日<span class="req">*</span></label>
+        <input type="date" id="workDate" onchange="save();updateProgress()">
+      </div>
+      <div class="field"><label>現場名<span class="req">*</span></label>
+        <select id="siteName" onchange="onSiteChange()"></select>
+        <div class="add-row" id="siteAddRow">
+          <input type="text" id="siteInput" placeholder="現場名を入力してください">
+          <button class="btn-inline-add" onclick="addSite()">+</button>
+        </div>
+      </div>
+      <div class="field"><label>天候</label>
+        <select id="weather" onchange="save()">
+          <option value="">選択してください</option>
+          <option>☀️ 晴れ</option><option>⛅ 曇り</option><option>🌧️ 雨</option><option>❄️ 雪</option><option>💨 強風</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(2)">
+      <div class="card-num" id="num2">2</div>
+      <div><div class="card-title">👷 参加者</div><div class="card-subtitle">責任者・作業員の登録</div></div>
+      <div class="card-chevron" id="chev2">▶</div>
+    </div>
+    <div class="card-body" id="body2">
+      <div class="field"><label>責任者<span class="req">*</span></label>
+        <select id="leaderSel" onchange="onLeaderChange()"></select>
+        <div class="add-row" id="leaderAddRow">
+          <input type="text" id="leaderInput" placeholder="氏名を入力してください">
+          <button class="btn-inline-add" onclick="addLeader()">+</button>
+        </div>
+      </div>
+      <div class="field"><label>作業員（タップで選択）</label>
+        <div id="workerCheckList" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;"></div>
+        <div class="tag-container" id="memberTags"></div>
+        <div class="add-row" id="workerAddRow">
+          <input type="text" id="workerInput" placeholder="新しい作業員名を入力">
+          <button class="btn-inline-add" onclick="addNewWorker()">+</button>
+        </div>
+        <button style="width:100%;background:transparent;border:2px dashed var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;" onclick="toggleWorkerAdd()">＋ 新しい作業員を登録</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(3)">
+      <div class="card-num" id="num3">3</div>
+      <div><div class="card-title">🔧 作業内容</div><div class="card-subtitle">種別・詳細・機械・保護具</div></div>
+      <div class="card-chevron" id="chev3">▶</div>
+    </div>
+    <div class="card-body" id="body3">
+      <div class="field"><label>作業種別<span class="req">*</span></label>
+        <select id="workType" onchange="save();updateProgress()"></select>
+      </div>
+      <div class="field"><label>作業詳細・手順<span class="req">*</span></label>
+        <textarea id="workDetail" placeholder="例：〇〇階のコンクリート打設作業を実施。バイブレーター使用。" oninput="save();updateProgress()"></textarea>
+      </div>
+      <div class="field"><label>使用機械・工具</label>
+        <select id="equipment" onchange="save()"></select>
+      </div>
+      <div class="field"><label>保護具</label>
+        <div class="ppe-wrap" id="ppeWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(4)">
+      <div class="card-num" id="num4">4</div>
+      <div><div class="card-title">⚠️ 危険ポイント・対策</div><div class="card-subtitle">予知される危険と対応策</div></div>
+      <div class="card-chevron" id="chev4">▶</div>
+    </div>
+    <div class="card-body" id="body4">
+      <div class="info-box">⚡「どんな状況で → どうなる危険があるか」を記入し、それに対する対策・行動目標も一緒に記入してください。</div>
+      <button onclick="openTplSheet()" style="width:100%;margin-top:10px;background:#fff3e0;border:2px solid var(--orange);border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--orange);cursor:pointer;font-family:inherit;">📋 過去の危険ポイントから引用する</button>
+      <div class="risk-list" id="riskList"></div>
+      <button class="btn-add-risk" onclick="addRisk()">＋ 危険ポイントを追加</button>
+      <div class="field" style="margin-top:16px"><label>本日の安全目標</label>
+        <input type="text" id="safetyGoal" placeholder="例：高所作業時は必ず二丁掛けで" oninput="save()">
+      </div>
+      <div class="field"><label>特記事項・連絡事項</label>
+        <textarea id="notes" placeholder="その他、共有事項があれば記入" style="min-height:70px" oninput="save()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="submitForm()">✅ KY記録を完成・保存</button>
+  <button class="btn-sheets" onclick="sendToSheets()">☁️ Googleスプレッドシートに送信</button>
+  <button class="btn-reset" onclick="resetToday()">🔄 今日の入力をリセット</button>
+  <button class="btn-danger" onclick="clearAllData()">🗑️ すべてのデータを消去</button>
+
+  <div id="preview-panel">
+    <div class="preview-title">⚠️ KY 活動記録票</div>
+    <div id="preview-content"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===== 一覧ページ ===== -->
+<div class="page" id="page-list">
+<div class="list-page">
+  <div class="list-summary">
+    <div class="summary-card"><div class="s-num" id="sum-total">0</div><div class="s-label">総記録数</div></div>
+    <div class="summary-card"><div class="s-num" id="sum-month">0</div><div class="s-label">今月の記録</div></div>
+    <div class="summary-card"><div class="s-num" id="sum-high" style="color:var(--red)">0</div><div class="s-label">高リスク件数</div></div>
+    <div class="summary-card"><div class="s-num" id="sum-unsent" style="color:var(--orange)">0</div><div class="s-label">未送信件数</div></div>
+  </div>
+  <div class="list-filter">
+    <input type="month" id="filterMonth" onchange="renderList()">
+    <select id="filterSite" onchange="renderList()"><option value="">すべての現場</option></select>
+  </div>
+  <div id="recordList"></div>
+</div>
+</div>
+
+<!-- ===== 設定ページ ===== -->
+<div class="page" id="page-settings">
+<div class="settings-page">
+
+  <!-- 作業種別 -->
+  <div class="settings-section">
+    <div class="settings-section-header">
+      <span class="s-icon">☁️</span>
+      <h2>Googleスプレッドシート連携</h2>
+    </div>
+    <div class="settings-section-body">
+      <p style="font-size:13px;line-height:1.8;color:#444;margin-bottom:12px">
+        Google Apps Script（GAS）のウェブアプリURLを登録すると、<br>
+        「☁️ Googleスプレッドシートに送信」ボタンでKY記録を自動送信できます。
+      </p>
+      <div class="field" style="margin-top:0">
+        <label>GAS ウェブアプリ URL</label>
+        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." oninput="saveGasUrl()">
+      </div>
+      <p class="settings-hint" style="margin-top:8px">
+        ⓘ 設定手順書（付属のWordファイル）を参照してURLを取得・貼り付けてください
+      </p>
+      <div id="gasStatus" style="margin-top:10px;font-size:13px;font-weight:700;color:var(--green);display:none">✅ URL登録済み</div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <p style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:8px">📥 マスターデータの同期</p>
+        <p style="font-size:12px;color:#555;line-height:1.7;margin-bottom:10px">
+          スプレッドシートの「マスター」シートに書いた<br>
+          現場名・作業員名をKYツールに読み込みます。<br>
+          管理者がスプレッドシートを更新したあと、<br>このボタンを押すと最新のリストに反映されます。
+        </p>
+        <button onclick="syncMaster()" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.04em;">
+          📥 スプレッドシートから現場・作業員を読み込む
+        </button>
+        <div id="syncStatus" style="margin-top:8px;font-size:12px;font-weight:700;text-align:center;display:none"></div>
+        <div id="masterPasteArea" style="display:none;margin-top:10px;">
+          <p style="font-size:12px;color:#1565C0;font-weight:700;margin-bottom:6px;">👆 開いたタブの内容をすべてコピーして下に貼り付けてください</p>
+          <textarea id="masterPasteInput" placeholder='{"status":"ok","sites":[...],"workers":[...]}' style="width:100%;border:2px solid #1565C0;border-radius:10px;padding:10px;font-size:13px;font-family:inherit;min-height:80px;outline:none;resize:vertical;-webkit-appearance:none;"></textarea>
+          <button onclick="applyMasterData()" style="width:100%;margin-top:8px;background:#1565C0;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">✅ 貼り付けた内容を反映する</button>
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- 作業種別 -->
+  <div class="settings-section">
+    <div class="settings-section-header">
+      <span class="s-icon">🔧</span>
+      <h2>作業種別の編集</h2>
+    </div>
+    <div class="settings-section-body">
+      <div class="settings-item-list" id="workTypeList"></div>
+      <div class="settings-add-row">
+        <input type="text" id="workTypeInput" placeholder="新しい作業種別を入力" onkeydown="if(event.key==='Enter')addWorkType()">
+        <button class="btn-settings-add" onclick="addWorkType()">+</button>
+      </div>
+      <p class="settings-hint">↑↓ボタンで順番を変更、✕ボタンで削除できます</p>
+      <button class="settings-reset-btn" onclick="resetWorkTypes()">🔄 初期値に戻す</button>
+    </div>
+  </div>
+
+  <!-- 使用機械・工具 -->
+  <div class="settings-section">
+    <div class="settings-section-header">
+      <span class="s-icon">🏗️</span>
+      <h2>使用機械・工具の編集</h2>
+    </div>
+    <div class="settings-section-body">
+      <div class="settings-item-list" id="equipList"></div>
+      <div class="settings-add-row">
+        <input type="text" id="equipInput" placeholder="新しい機械・工具を入力" onkeydown="if(event.key==='Enter')addEquip()">
+        <button class="btn-settings-add" onclick="addEquip()">+</button>
+      </div>
+      <p class="settings-hint">↑↓ボタンで順番を変更、✕ボタンで削除できます</p>
+      <button class="settings-reset-btn" onclick="resetEquips()">🔄 初期値に戻す</button>
+    </div>
+  </div>
+
+  <!-- ③ URL運用ガイド -->
+  <div class="settings-section" style="border:2px solid var(--orange);">
+    <div class="settings-section-header" style="background:var(--orange);">
+      <span class="s-icon">🌐</span>
+      <h2>URLで開く運用（推奨）</h2>
+    </div>
+    <div class="settings-section-body">
+      <p style="font-size:13px;color:#444;line-height:1.8;margin-bottom:12px">
+        このHTMLファイルをGoogleドライブに置いてURLで開くと、<br>
+        <b>ファイルを配布し直さなくても全員が常に最新版を使えます。</b>
+      </p>
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+        <p style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:8px">📋 設定手順</p>
+        <p style="font-size:12px;color:#444;line-height:2.0">
+          ① Googleドライブを開いてHTMLファイルをアップロード<br>
+          ② ファイルを右クリック →「共有」→「リンクを知っている全員が閲覧可」に設定<br>
+          ③ 「リンクをコピー」してLINEグループに固定投稿<br>
+          ④ メンバーがリンクを開きホーム画面に追加（ブックマーク）<br>
+          ⑤ 次回からはツールを更新したファイルをドライブに上書きするだけ
+        </p>
+      </div>
+      <div style="background:#E8F5E9;border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+        <p style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:6px">✅ メリット</p>
+        <p style="font-size:12px;color:#333;line-height:1.8">
+          ・新機能追加のたびにファイルを全員に配布しなくてよい<br>
+          ・全員が同じ最新版を使えるので混乱がない<br>
+          ・マスター同期が安定しやすくなる
+        </p>
+      </div>
+      <div style="background:#FFF8E1;border-radius:10px;padding:10px 14px;">
+        <p style="font-size:12px;font-weight:700;color:#7B5800;margin-bottom:6px">⚠️ 注意</p>
+        <p style="font-size:12px;color:#555;line-height:1.8">
+          ・Googleドライブから開く場合、データは<b>各自のスマホ内</b>に保存されます<br>
+          ・機種変更の前には必ずスプレッドシートへ送信してバックアップを取ってください
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- テンプレートモーダル -->
+<div class="tpl-overlay" id="tplOverlay" onclick="closeTplSheet(event)">
+  <div class="tpl-sheet" onclick="event.stopPropagation()">
+    <div class="tpl-title">
+      📋 過去の危険ポイントから引用
+      <button class="tpl-close" onclick="closeTplSheet()">✕</button>
+    </div>
+    <div id="tplList"></div>
+  </div>
+</div>
+
+<script>
+// ===== KEYS =====
+const KEY={sites:'ky_sites',workers:'ky_workers',form:'ky_form',records:'ky_records',workTypes:'ky_workTypes',equips:'ky_equips',gasUrl:'ky_gasUrl'};
+
+// ===== DEFAULT DATA =====
+const DEFAULT_WORK_TYPES=['掘削・土工事','基礎工事','鉄筋工事','型枠工事','コンクリート打設','鉄骨工事','内装工事','外装工事','電気工事','配管工事','高所作業','解体工事','その他'];
+const DEFAULT_EQUIPS=['バックホウ','クレーン','高所作業車','振動ローラー','コンクリートミキサー','電動ドリル','グラインダー','溶接機','チェーンブロック','足場','手工具一式','その他'];
+const DEFAULT_SITES=['〇〇ビル新築工事','△△マンション改修工事','□□道路工事'];
+const PPE_ITEMS=['ヘルメット','安全帯','安全靴','手袋','防塵マスク','保護メガネ','蛍光ベスト','耳栓'];
+
+// ===== STATE =====
+let sites=[],workers=[],workTypes=[],equips=[];
+let members=[],risks=[],riskCount=0,ppeSelected=new Set();
+
+// ===== INIT =====
+window.onload=function(){
+  loadAll();
+  buildPPE();
+  loadForm();
+  if(risks.length===0)addRisk();
+  updateProgress();
+  const now=new Date();
+  document.getElementById('filterMonth').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  updateUnsentBadge();
+  checkBackupReminder();
+};
+
+// ===== LOAD ALL MASTERS =====
+function loadAll(){
+  try{sites=JSON.parse(localStorage.getItem(KEY.sites))||DEFAULT_SITES.slice();}catch(e){sites=DEFAULT_SITES.slice();}
+  try{workers=JSON.parse(localStorage.getItem(KEY.workers))||[];}catch(e){workers=[];}
+  try{workTypes=JSON.parse(localStorage.getItem(KEY.workTypes))||DEFAULT_WORK_TYPES.slice();}catch(e){workTypes=DEFAULT_WORK_TYPES.slice();}
+  try{equips=JSON.parse(localStorage.getItem(KEY.equips))||DEFAULT_EQUIPS.slice();}catch(e){equips=DEFAULT_EQUIPS.slice();}
+  rebuildSiteSelect();
+  rebuildLeaderSelect();
+  rebuildWorkerSelect();
+  rebuildWorkTypeSelect();
+  rebuildEquipSelect();
+  renderWorkTypeSettings();
+  renderEquipSettings();
+  // GAS URL
+  const savedUrl=localStorage.getItem(KEY.gasUrl)||'';
+  const gasInput=document.getElementById('gasUrlInput');
+  if(gasInput){gasInput.value=savedUrl;updateGasStatus(savedUrl);}
+}
+function saveMasters(){
+  localStorage.setItem(KEY.sites,JSON.stringify(sites));
+  localStorage.setItem(KEY.workers,JSON.stringify(workers));
+  localStorage.setItem(KEY.workTypes,JSON.stringify(workTypes));
+  localStorage.setItem(KEY.equips,JSON.stringify(equips));
+}
+
+// ===== PAGE SWITCH =====
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  ['form','list','settings'].forEach(t=>{
+    document.getElementById('tab-'+t+'-btn').classList.toggle('active-tab',t===p);
+  });
+  if(p==='list'){renderList();updateSummary();}
+  if(p==='settings'){renderWorkTypeSettings();renderEquipSettings();}
+}
+
+// ===== CARD =====
+function toggleCard(n){
+  document.getElementById('body'+n).classList.toggle('open');
+  document.getElementById('chev'+n).classList.toggle('open');
+}
+
+// ===== SELECTS =====
+function rebuildSiteSelect(){
+  const sel=document.getElementById('siteName');const cur=sel.value;
+  sel.innerHTML='<option value="">現場を選択してください</option>';
+  sites.forEach(s=>{const o=new Option(s,s);sel.add(o);});
+  sel.add(new Option('＋ 新しい現場を追加…','__other__'));
+  if(cur)sel.value=cur;
+  const fs=document.getElementById('filterSite');if(!fs)return;
+  const fc=fs.value;fs.innerHTML='<option value="">すべての現場</option>';
+  sites.forEach(s=>{fs.add(new Option(s,s));});if(fc)fs.value=fc;
+}
+function rebuildLeaderSelect(){
+  const sel=document.getElementById('leaderSel');const cur=sel.value;
+  sel.innerHTML='<option value="">責任者を選択してください</option>';
+  workers.forEach(w=>sel.add(new Option(w,w)));
+  sel.add(new Option('＋ 新しい人を登録…','__new__'));
+  if(cur)sel.value=cur;
+}
+function rebuildWorkerSelect(){renderWorkerChecks();}
+
+function renderWorkerChecks(){
+  const list=document.getElementById('workerCheckList');
+  if(!list)return;
+  if(workers.length===0){
+    list.innerHTML='<div class="worker-empty">作業員が登録されていません<br>下の「＋ 新しい作業員を登録」から追加してください</div>';
+    return;
+  }
+  list.innerHTML='';
+  workers.forEach(name=>{
+    const isChecked=members.includes(name);
+    const item=document.createElement('div');
+    item.className='worker-check-item'+(isChecked?' checked':'');
+    item.innerHTML=`
+      <div class="wc-box${isChecked?' on':''}">
+        <div class="wc-mark"></div>
+      </div>
+      <span class="wc-name">${name}</span>`;
+    item.onclick=()=>toggleWorker(name);
+    list.appendChild(item);
+  });
+}
+
+function toggleWorker(name){
+  if(members.includes(name)){
+    members=members.filter(m=>m!==name);
+  }else{
+    members.push(name);
+  }
+  renderWorkerChecks();
+  renderTags();
+  save();
+}
+function rebuildWorkTypeSelect(){
+  const sel=document.getElementById('workType');const cur=sel.value;
+  sel.innerHTML='<option value="">作業を選択</option>';
+  workTypes.forEach(t=>sel.add(new Option(t,t)));
+  if(cur)sel.value=cur;
+}
+function rebuildEquipSelect(){
+  const sel=document.getElementById('equipment');const cur=sel.value;
+  sel.innerHTML='<option value="">機械・工具を選択</option>';
+  equips.forEach(e=>sel.add(new Option(e,e)));
+  if(cur)sel.value=cur;
+}
+
+// ===== 現場 =====
+function onSiteChange(){
+  const v=document.getElementById('siteName').value;
+  document.getElementById('siteAddRow').style.display=v==='__other__'?'flex':'none';
+  if(v==='__other__')document.getElementById('siteInput').focus();
+  save();updateProgress();
+}
+function addSite(){
+  const input=document.getElementById('siteInput');const name=input.value.trim();
+  if(!name){showToast('⚠️ 現場名を入力してください');return;}
+  if(sites.includes(name)){showToast('すでに登録されています');return;}
+  sites.push(name);saveMasters();rebuildSiteSelect();
+  document.getElementById('siteName').value=name;
+  document.getElementById('siteAddRow').style.display='none';
+  input.value='';save();updateProgress();showToast('✅ 現場を追加しました');
+}
+
+// ===== 責任者 =====
+function onLeaderChange(){
+  const v=document.getElementById('leaderSel').value;
+  document.getElementById('leaderAddRow').style.display=v==='__new__'?'flex':'none';
+  if(v==='__new__')document.getElementById('leaderInput').focus();
+  save();updateProgress();
+}
+function addLeader(){
+  const input=document.getElementById('leaderInput');const name=input.value.trim();
+  if(!name){showToast('⚠️ 氏名を入力してください');return;}
+  if(!workers.includes(name)){workers.push(name);saveMasters();rebuildLeaderSelect();rebuildWorkerSelect();}
+  document.getElementById('leaderSel').value=name;
+  document.getElementById('leaderAddRow').style.display='none';
+  input.value='';save();updateProgress();showToast('✅ 登録しました');
+}
+
+// ===== 作業員 =====
+function toggleWorkerAdd(){
+  const row=document.getElementById('workerAddRow');
+  row.style.display=row.style.display==='flex'?'none':'flex';
+  if(row.style.display==='flex')document.getElementById('workerInput').focus();
+}
+function addNewWorker(){
+  const input=document.getElementById('workerInput');const name=input.value.trim();
+  if(!name){showToast('⚠️ 氏名を入力してください');return;}
+  if(!workers.includes(name)){workers.push(name);saveMasters();rebuildLeaderSelect();}
+  if(!members.includes(name)){members.push(name);}
+  renderWorkerChecks();
+  renderTags();
+  input.value='';document.getElementById('workerAddRow').style.display='none';
+  save();showToast('✅ 作業員を登録・追加しました');
+}
+function removeMember(name){members=members.filter(m=>m!==name);renderWorkerChecks();renderTags();save();}
+function renderTags(){
+  const c=document.getElementById('memberTags');c.innerHTML='';
+  members.forEach(name=>{
+    const t=document.createElement('div');t.className='tag';
+    t.innerHTML=`${name}<button class="tag-x" onclick="removeMember('${name}')">✕</button>`;
+    c.appendChild(t);
+  });
+}
+
+// ===== PPE =====
+function buildPPE(){
+  const wrap=document.getElementById('ppeWrap');
+  PPE_ITEMS.forEach(item=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='ppe-btn';btn.dataset.item=item;btn.textContent=item;
+    btn.onclick=()=>{if(ppeSelected.has(item)){ppeSelected.delete(item);btn.classList.remove('on');}else{ppeSelected.add(item);btn.classList.add('on');}save();};
+    wrap.appendChild(btn);
+  });
+}
+
+// ===== RISKS =====
+function addRisk(){riskCount++;risks.push({id:'r'+riskCount,danger:'',countermeasure:'',level:''});renderRisks();save();updateProgress();}
+function removeRisk(id){risks=risks.filter(r=>r.id!==id);renderRisks();save();}
+function updateRisk(id,field,val){const r=risks.find(r=>r.id===id);if(r){r[field]=val;save();}}
+function setRiskLevel(id,level,btn){
+  const r=risks.find(r=>r.id===id);if(r)r.level=level;
+  btn.closest('.risk-level').querySelectorAll('.rl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');save();
+}
+function renderRisks(){
+  const list=document.getElementById('riskList');list.innerHTML='';
+  risks.forEach((r,i)=>{
+    const div=document.createElement('div');div.className='risk-row';
+    div.innerHTML=`
+      <div class="risk-row-header"><span class="risk-row-num">⚠️ 危険ポイント ${i+1}</span>${risks.length>1?`<button class="btn-rm-risk" onclick="removeRisk('${r.id}')">✕</button>`:''}</div>
+      <div class="risk-sub">危険の内容</div>
+      <textarea placeholder="例：足場が濡れていると → 滑って転落する危険がある" oninput="updateRisk('${r.id}','danger',this.value)">${r.danger}</textarea>
+      <div class="risk-sub risk-gap">🛡️ 対策・行動目標</div>
+      <textarea placeholder="例：作業前に足場の水分を拭き取り、滑り止めを確認してから登る" oninput="updateRisk('${r.id}','countermeasure',this.value)">${r.countermeasure}</textarea>
+      <div class="risk-sub risk-gap">リスクレベル</div>
+      <div class="risk-level">
+        <button class="rl-btn low ${r.level==='low'?'active':''}" onclick="setRiskLevel('${r.id}','low',this)">🟢 低</button>
+        <button class="rl-btn mid ${r.level==='mid'?'active':''}" onclick="setRiskLevel('${r.id}','mid',this)">🟠 中</button>
+        <button class="rl-btn high ${r.level==='high'?'active':''}" onclick="setRiskLevel('${r.id}','high',this)">🔴 高</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+// ===== SETTINGS: 作業種別 =====
+function renderWorkTypeSettings(){
+  const list=document.getElementById('workTypeList');list.innerHTML='';
+  workTypes.forEach((t,i)=>{
+    const row=document.createElement('div');row.className='settings-item';
+    row.innerHTML=`
+      <span>${t}</span>
+      <div class="item-order">
+        <button class="btn-item-up" onclick="moveWorkType(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn-item-down" onclick="moveWorkType(${i},1)" ${i===workTypes.length-1?'disabled':''}>↓</button>
+      </div>
+      <button class="btn-item-del" onclick="delWorkType(${i})">✕</button>`;
+    list.appendChild(row);
+  });
+}
+function addWorkType(){
+  const input=document.getElementById('workTypeInput');const val=input.value.trim();
+  if(!val){showToast('⚠️ 作業種別を入力してください');return;}
+  if(workTypes.includes(val)){showToast('すでに登録されています');return;}
+  workTypes.push(val);saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+  input.value='';showToast('✅ 追加しました');
+}
+function moveWorkType(i,dir){
+  const j=i+dir;if(j<0||j>=workTypes.length)return;
+  [workTypes[i],workTypes[j]]=[workTypes[j],workTypes[i]];
+  saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+}
+function delWorkType(i){
+  if(!confirm(`「${workTypes[i]}」を削除しますか？`))return;
+  workTypes.splice(i,1);saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+  showToast('🗑️ 削除しました');
+}
+function resetWorkTypes(){
+  if(!confirm('作業種別を初期値に戻しますか？'))return;
+  workTypes=DEFAULT_WORK_TYPES.slice();saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+  showToast('🔄 初期値に戻しました');
+}
+
+// ===== SETTINGS: 使用機械 =====
+function renderEquipSettings(){
+  const list=document.getElementById('equipList');list.innerHTML='';
+  equips.forEach((e,i)=>{
+    const row=document.createElement('div');row.className='settings-item';
+    row.innerHTML=`
+      <span>${e}</span>
+      <div class="item-order">
+        <button class="btn-item-up" onclick="moveEquip(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn-item-down" onclick="moveEquip(${i},1)" ${i===equips.length-1?'disabled':''}>↓</button>
+      </div>
+      <button class="btn-item-del" onclick="delEquip(${i})">✕</button>`;
+    list.appendChild(row);
+  });
+}
+function addEquip(){
+  const input=document.getElementById('equipInput');const val=input.value.trim();
+  if(!val){showToast('⚠️ 機械・工具名を入力してください');return;}
+  if(equips.includes(val)){showToast('すでに登録されています');return;}
+  equips.push(val);saveMasters();rebuildEquipSelect();renderEquipSettings();
+  input.value='';showToast('✅ 追加しました');
+}
+function moveEquip(i,dir){
+  const j=i+dir;if(j<0||j>=equips.length)return;
+  [equips[i],equips[j]]=[equips[j],equips[i]];
+  saveMasters();rebuildEquipSelect();renderEquipSettings();
+}
+function delEquip(i){
+  if(!confirm(`「${equips[i]}」を削除しますか？`))return;
+  equips.splice(i,1);saveMasters();rebuildEquipSelect();renderEquipSettings();
+  showToast('🗑️ 削除しました');
+}
+function resetEquips(){
+  if(!confirm('使用機械・工具を初期値に戻しますか？'))return;
+  equips=DEFAULT_EQUIPS.slice();saveMasters();rebuildEquipSelect();renderEquipSettings();
+  showToast('🔄 初期値に戻しました');
+}
+
+// ===== FORM SAVE/LOAD =====
+function save(){
+  const data={
+    workDate:document.getElementById('workDate').value,
+    siteVal:document.getElementById('siteName').value,
+    weather:document.getElementById('weather').value,
+    leaderVal:document.getElementById('leaderSel').value,
+    workType:document.getElementById('workType').value,
+    workDetail:document.getElementById('workDetail').value,
+    equipment:document.getElementById('equipment').value,
+    safetyGoal:document.getElementById('safetyGoal').value,
+    notes:document.getElementById('notes').value,
+    members,risks,riskCount,ppe:Array.from(ppeSelected),
+  };
+  localStorage.setItem(KEY.form,JSON.stringify(data));
+}
+function loadForm(){
+  let data;try{data=JSON.parse(localStorage.getItem(KEY.form));}catch(e){}
+  if(!data){document.getElementById('workDate').value=todayStr();return;}
+  document.getElementById('workDate').value=data.workDate||todayStr();
+  document.getElementById('weather').value=data.weather||'';
+  document.getElementById('workDetail').value=data.workDetail||'';
+  document.getElementById('safetyGoal').value=data.safetyGoal||'';
+  document.getElementById('notes').value=data.notes||'';
+  if(data.siteVal&&data.siteVal!=='__other__'){const s=document.getElementById('siteName');if([...s.options].some(o=>o.value===data.siteVal))s.value=data.siteVal;}
+  if(data.leaderVal){const s=document.getElementById('leaderSel');if([...s.options].some(o=>o.value===data.leaderVal))s.value=data.leaderVal;}
+  if(data.workType){const s=document.getElementById('workType');if([...s.options].some(o=>o.value===data.workType))s.value=data.workType;}
+  if(data.equipment){const s=document.getElementById('equipment');if([...s.options].some(o=>o.value===data.equipment))s.value=data.equipment;}
+  members=data.members||[];renderWorkerChecks();renderTags();
+  risks=data.risks||[];riskCount=data.riskCount||0;renderRisks();
+  ppeSelected=new Set(data.ppe||[]);
+  document.querySelectorAll('.ppe-btn').forEach(b=>{if(ppeSelected.has(b.dataset.item))b.classList.add('on');});
+  updateProgress();
+}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+
+// ===== PROGRESS =====
+function updateProgress(){
+  const sv=document.getElementById('siteName').value;
+  const lv=document.getElementById('leaderSel').value;
+  const checks=[
+    ()=>document.getElementById('workDate').value&&sv&&sv!=='__other__',
+    ()=>lv&&lv!=='__new__',
+    ()=>document.getElementById('workType').value&&document.getElementById('workDetail').value,
+    ()=>risks.some(r=>r.danger.trim()),
+  ];
+  let filled=0;
+  checks.forEach((fn,i)=>{
+    const ok=!!fn();const el=document.getElementById('num'+(i+1));
+    if(ok){filled++;el.classList.add('done');el.textContent='✓';}
+    else{el.classList.remove('done');el.textContent=i+1;}
+  });
+  document.getElementById('progressFill').style.width=(filled/4*100)+'%';
+  document.getElementById('progressLabel').textContent=`${filled} / 4 セクション入力済み`;
+}
+
+// ===== SUBMIT =====
+function submitForm(){
+  const sv=document.getElementById('siteName').value;
+  const lv=document.getElementById('leaderSel').value;
+  if(!document.getElementById('workDate').value){showToast('⚠️ 作業日を入力してください');return;}
+  if(!sv||sv==='__other__'){showToast('⚠️ 現場名を選択してください');return;}
+  if(!lv||lv==='__new__'){showToast('⚠️ 責任者を選択してください');return;}
+  if(!document.getElementById('workType').value){showToast('⚠️ 作業種別を選択してください');return;}
+  if(!document.getElementById('workDetail').value){showToast('⚠️ 作業詳細を入力してください');return;}
+
+  const record={
+    id:'rec_'+Date.now(),savedAt:new Date().toISOString(),
+    workDate:document.getElementById('workDate').value,
+    site:sv,weather:document.getElementById('weather').value,
+    leader:lv,members:[...members],
+    workType:document.getElementById('workType').value,
+    workDetail:document.getElementById('workDetail').value,
+    equipment:document.getElementById('equipment').value,
+    ppe:Array.from(ppeSelected),
+    risks:JSON.parse(JSON.stringify(risks)),
+    safetyGoal:document.getElementById('safetyGoal').value,
+    notes:document.getElementById('notes').value,
+    sent:false,
+  };
+  const recs=getRecords();
+  const sameIdx=recs.findIndex(r=>r.workDate===record.workDate&&r.site===record.site);
+  if(sameIdx>=0){if(!confirm('同じ日・現場の記録があります。上書きしますか？'))return;recs[sameIdx]=record;}
+  else recs.unshift(record);
+  saveRecords(recs);
+  buildPreview();
+  document.getElementById('preview-panel').style.display='block';
+  showToast('✅ KY記録を保存しました！');
+  document.getElementById('preview-panel').scrollIntoView({behavior:'smooth'});
+  setTimeout(()=>{if(confirm('KY記録票を印刷・保存しますか？'))window.print();},400);
+}
+
+// ===== PREVIEW =====
+function buildPreview(){
+  const date=document.getElementById('workDate').value;
+  const sv=document.getElementById('siteName').value;
+  const site=(sv&&sv!=='__other__')?sv:'（未選択）';
+  const weather=document.getElementById('weather').value||'－';
+  const lv=document.getElementById('leaderSel').value;
+  const leaderName=(lv&&lv!=='__new__')?lv:'（未選択）';
+  const mems=members.length?members.join('、'):'（未登録）';
+  const wType=document.getElementById('workType').value||'（未選択）';
+  const wDetail=document.getElementById('workDetail').value||'（未入力）';
+  const equip=document.getElementById('equipment').value||'－';
+  const ppe=Array.from(ppeSelected).join('、')||'－';
+  const goal=document.getElementById('safetyGoal').value||'－';
+  const notes=document.getElementById('notes').value||'－';
+  const dateStr=date?new Date(date+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'（未入力）';
+  const riskHTML=risks.map((r,i)=>{
+    const badge=r.level==='low'?'<span class="rb low">低</span>':r.level==='mid'?'<span class="rb mid">中</span>':r.level==='high'?'<span class="rb high">高</span>':'';
+    return`<tr><th>危険 ${i+1}</th><td><div>${r.danger||'（未入力）'}</div><div style="margin-top:5px;background:#f0f0f0;border-radius:6px;padding:5px 8px;font-size:12px;color:#333">🛡️ 対策：${r.countermeasure||'－'}</div>${badge?`<div style="margin-top:4px">${badge}</div>`:''}</td></tr>`;
+  }).join('');
+  document.getElementById('preview-content').innerHTML=`
+    <div class="preview-section"><h3>📅 基本情報</h3><table class="pt"><tr><th>作業日</th><td>${dateStr}</td></tr><tr><th>現場名</th><td>${site}</td></tr><tr><th>天候</th><td>${weather}</td></tr></table></div>
+    <div class="preview-section"><h3>👷 参加者</h3><table class="pt"><tr><th>責任者</th><td>${leaderName}</td></tr><tr><th>作業員</th><td>${mems}</td></tr></table></div>
+    <div class="preview-section"><h3>🔧 作業内容</h3><table class="pt"><tr><th>作業種別</th><td>${wType}</td></tr><tr><th>作業詳細</th><td>${wDetail}</td></tr><tr><th>機械・工具</th><td>${equip}</td></tr><tr><th>保護具</th><td>${ppe}</td></tr></table></div>
+    <div class="preview-section"><h3>⚠️ 危険ポイント・対策</h3><table class="pt">${riskHTML||'<tr><td colspan="2">（未入力）</td></tr>'}</table></div>
+    <div class="preview-section"><h3>🎯 安全目標・連絡</h3><table class="pt"><tr><th>安全目標</th><td>${goal}</td></tr><tr><th>特記事項</th><td>${notes}</td></tr></table></div>
+    <div style="text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid #eee"><p style="font-size:11px;color:#999">作成：${new Date().toLocaleString('ja-JP')}</p></div>`;
+}
+
+// ===== RECORDS =====
+function getRecords(){try{return JSON.parse(localStorage.getItem(KEY.records))||[];}catch(e){return[];}}
+function saveRecords(recs){localStorage.setItem(KEY.records,JSON.stringify(recs));}
+
+function updateSummary(){
+  const recs=getRecords();
+  const now=new Date();
+  const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('sum-total').textContent=recs.length;
+  document.getElementById('sum-month').textContent=recs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
+  document.getElementById('sum-high').textContent=recs.reduce((s,r)=>s+(r.risks||[]).filter(x=>x.level==='high').length,0);
+  const unsentN=recs.filter(r=>!r.sent).length;
+  document.getElementById('sum-unsent').textContent=unsentN;
+  updateUnsentBadge();
+}
+
+function renderList(){
+  const recs=getRecords();
+  const fm=document.getElementById('filterMonth').value;
+  const fs=document.getElementById('filterSite').value;
+  let filtered=recs;
+  if(fm)filtered=filtered.filter(r=>r.workDate&&r.workDate.startsWith(fm));
+  if(fs)filtered=filtered.filter(r=>r.site===fs);
+  filtered.sort((a,b)=>b.workDate.localeCompare(a.workDate));
+  const container=document.getElementById('recordList');container.innerHTML='';
+  if(filtered.length===0){
+    container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を完成・保存すると<br>ここに表示されます。</p></div>`;
+    updateSummary();return;
+  }
+  filtered.forEach(rec=>{
+    const d=new Date(rec.workDate+'T00:00:00');
+    const month=`${d.getMonth()+1}月`;const day=d.getDate();
+    const dow=['日','月','火','水','木','金','土'][d.getDay()];
+    const highR=(rec.risks||[]).filter(r=>r.level==='high').length;
+    const midR=(rec.risks||[]).filter(r=>r.level==='mid').length;
+    let badgeHTML='';
+    if(rec.workType)badgeHTML+=`<span class="record-badge">${rec.workType}</span>`;
+    if(highR>0)badgeHTML+=`<span class="record-badge has-high">🔴 高リスク×${highR}</span>`;
+    else if(midR>0)badgeHTML+=`<span class="record-badge has-mid">🟠 中リスク×${midR}</span>`;
+    const memStr=rec.leader+(rec.members&&rec.members.length?` 他${rec.members.length}名`:'');
+    const sentBadge=rec.sent?'<span class="sent-badge sent">☁️送信済</span>':'<span class="sent-badge unsent">未送信</span>';
+    const card=document.createElement('div');card.className='record-card'+(rec.sent?'':' unsent-card');card.id='reccard_'+rec.id;
+    card.innerHTML=`
+      <div class="record-card-header" onclick="toggleRecDetail('${rec.id}')">
+        <div class="record-date-badge"><div class="r-month">${month}</div><div class="r-day">${day}</div><div class="r-dow">(${dow})</div></div>
+        <div class="record-info">
+          <div class="record-site">${rec.site||'（現場未設定）'}${sentBadge}</div>
+          <div class="record-meta">👷 ${memStr}　${rec.weather||''}</div>
+          <div class="record-badges">${badgeHTML}</div>
+        </div>
+        <div class="record-chevron" id="recchev_${rec.id}">▶</div>
+      </div>
+      <div class="record-detail" id="recdetail_${rec.id}">
+        <div class="record-detail-inner">${buildRecordDetailHTML(rec)}</div>
+        <div class="record-actions">
+          <button class="btn-rec-print" onclick="printRecord('${rec.id}')">🖨️ 印刷</button>
+          <button class="btn-rec-edit"  onclick="editRecord('${rec.id}')">✏️ 編集</button>
+          <button class="btn-rec-delete" onclick="deleteRecord('${rec.id}')">🗑️</button>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+  updateSummary();
+}
+
+function buildRecordDetailHTML(rec){
+  const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'－';
+  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'（なし）';
+  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):'－';
+  const risksHTML=(rec.risks||[]).map((r,i)=>{
+    const badge=r.level==='low'?'<span class="rb low">低</span>':r.level==='mid'?'<span class="rb mid">中</span>':r.level==='high'?'<span class="rb high">高</span>':'';
+    return`<div class="detail-risk-block"><div class="detail-risk-label">⚠️ 危険ポイント ${i+1} ${badge}</div><div class="detail-risk-danger">${r.danger||'（未入力）'}</div><div class="detail-risk-measure">🛡️ 対策：${r.countermeasure||'－'}</div></div>`;
+  }).join('')||'<p style="font-size:13px;color:#999">なし</p>';
+  return`
+    <div class="detail-section"><div class="detail-section-title">📅 基本情報</div>
+      <table class="detail-table"><tr><th>作業日</th><td>${dateStr}</td></tr><tr><th>現場名</th><td>${rec.site||'－'}</td></tr><tr><th>天候</th><td>${rec.weather||'－'}</td></tr></table>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">👷 参加者</div>
+      <table class="detail-table"><tr><th>責任者</th><td>${rec.leader||'－'}</td></tr><tr><th>作業員</th><td>${mems}</td></tr></table>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">🔧 作業内容</div>
+      <table class="detail-table"><tr><th>作業種別</th><td>${rec.workType||'－'}</td></tr><tr><th>作業詳細</th><td>${rec.workDetail||'－'}</td></tr><tr><th>機械・工具</th><td>${rec.equipment||'－'}</td></tr><tr><th>保護具</th><td>${ppe}</td></tr></table>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">⚠️ 危険ポイント・対策</div>${risksHTML}</div>
+    <div class="detail-section"><div class="detail-section-title">🎯 安全目標・連絡</div>
+      <table class="detail-table"><tr><th>安全目標</th><td>${rec.safetyGoal||'－'}</td></tr><tr><th>特記事項</th><td>${rec.notes||'－'}</td></tr></table>
+    </div>`;
+}
+
+function toggleRecDetail(id){
+  const detail=document.getElementById('recdetail_'+id);
+  const chev=document.getElementById('recchev_'+id);
+  detail.classList.toggle('open');
+  chev.textContent=detail.classList.contains('open')?'▼':'▶';
+}
+function printRecord(id){
+  const rec=getRecords().find(r=>r.id===id);if(!rec)return;
+  const panel=document.getElementById('preview-panel');
+  panel.innerHTML=buildPrintPreview(rec);
+  panel.style.display='block';
+  showPage('form');
+  setTimeout(()=>window.print(),300);
+}
+function editRecord(id){
+  const rec=getRecords().find(r=>r.id===id);if(!rec)return;
+  document.getElementById('workDate').value=rec.workDate||'';
+  document.getElementById('weather').value=rec.weather||'';
+  document.getElementById('workDetail').value=rec.workDetail||'';
+  document.getElementById('safetyGoal').value=rec.safetyGoal||'';
+  document.getElementById('notes').value=rec.notes||'';
+  const ss=document.getElementById('siteName');if([...ss.options].some(o=>o.value===rec.site))ss.value=rec.site;
+  const ls=document.getElementById('leaderSel');if([...ls.options].some(o=>o.value===rec.leader))ls.value=rec.leader;
+  const wt=document.getElementById('workType');if([...wt.options].some(o=>o.value===rec.workType))wt.value=rec.workType;
+  const eq=document.getElementById('equipment');if([...eq.options].some(o=>o.value===rec.equipment))eq.value=rec.equipment;
+  members=[...rec.members||[]];renderWorkerChecks();renderTags();
+  risks=JSON.parse(JSON.stringify(rec.risks||[]));riskCount=risks.length;renderRisks();
+  ppeSelected=new Set(rec.ppe||[]);
+  document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.toggle('on',ppeSelected.has(b.dataset.item)));
+  save();showPage('form');updateProgress();showToast('✏️ 編集モードで読み込みました');
+}
+function deleteRecord(id){
+  if(!confirm('この記録を削除しますか？'))return;
+  saveRecords(getRecords().filter(r=>r.id!==id));
+  renderList();showToast('🗑️ 記録を削除しました');
+}
+
+// ===== RESET =====
+function resetToday(){
+  if(!confirm('今日の入力内容をリセットしますか？\n（現場・作業員・設定リストは残ります）'))return;
+  localStorage.removeItem(KEY.form);
+  members=[];risks=[];riskCount=0;ppeSelected.clear();
+  document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.remove('on'));
+  ['workDate','weather','leaderSel','workType','workDetail','safetyGoal','notes'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('siteName').value='';
+  document.getElementById('equipment').value='';
+  document.getElementById('siteAddRow').style.display='none';
+  document.getElementById('leaderAddRow').style.display='none';
+  document.getElementById('workerAddRow').style.display='none';
+  document.getElementById('workDate').value=todayStr();
+  document.getElementById('preview-panel').style.display='none';
+  renderTags();addRisk();updateProgress();
+  showToast('🔄 今日の入力をリセットしました');
+}
+function clearAllData(){
+  if(!confirm('すべてのデータ（記録・現場・作業員・設定）を消去しますか？\nこの操作は元に戻せません。'))return;
+  localStorage.clear();
+  loadAll();resetToday();
+  showToast('🗑️ すべてのデータを消去しました');
+}
+
+// ===== MASTER SYNC FROM SHEETS =====
+function syncMaster(){
+  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+  if(!gasUrl){
+    showToast('⚠️ 先にGAS URLを登録してください');
+    return;
+  }
+  const statusEl=document.getElementById('syncStatus');
+  if(!statusEl){ showToast('⚠️ 画面エラー。再読み込みしてください'); return; }
+  statusEl.style.display='block';
+  statusEl.style.color='var(--sub)';
+  statusEl.textContent='⏳ 読み込み中…';
+
+  // 新しいタブでGASを開いてJSONを取得し、手動でコピーしてもらう方式
+  const url=gasUrl+'?action=getMaster';
+  const win=window.open(url,'_blank');
+
+  // 案内メッセージを表示
+  statusEl.style.color='#1565C0';
+  statusEl.innerHTML='📋 開いたタブに表示された内容をすべてコピーして<br>下の入力欄に貼り付けてください。';
+
+  // 貼り付け欄を表示
+  const pasteArea=document.getElementById('masterPasteArea');
+  if(pasteArea) pasteArea.style.display='block';
+}
+
+function applyMasterData(){
+  const input=document.getElementById('masterPasteInput');
+  const statusEl=document.getElementById('syncStatus');
+  const text=(input?input.value:'').trim();
+  if(!text){ showToast('⚠️ データを貼り付けてください'); return; }
+  try{
+    const json=JSON.parse(text);
+    if(json.status!=='ok'){ throw new Error(json.msg||'ステータスエラー'); }
+    if(json.sites&&json.sites.length>0){
+      sites=json.sites;
+      localStorage.setItem(KEY.sites,JSON.stringify(sites));
+      rebuildSiteSelect();
+    }
+    if(json.workers&&json.workers.length>0){
+      workers=json.workers;
+      localStorage.setItem(KEY.workers,JSON.stringify(workers));
+      rebuildLeaderSelect();
+      rebuildWorkerSelect();
+    }
+    const sc=json.sites?json.sites.length:0;
+    const wc=json.workers?json.workers.length:0;
+    if(statusEl){
+      statusEl.style.display='block';
+      statusEl.style.color='var(--green)';
+      statusEl.textContent='✅ 同期完了！現場'+sc+'件・作業員'+wc+'名';
+    }
+    document.getElementById('masterPasteArea').style.display='none';
+    if(input)input.value='';
+    showToast('✅ マスターデータを反映しました！');
+  }catch(e){
+    showToast('❌ データの形式が正しくありません');
+    if(statusEl){
+      statusEl.style.display='block';
+      statusEl.style.color='var(--red)';
+      statusEl.textContent='❌ 貼り付けた内容が正しくありません：'+e.message;
+    }
+  }
+}
+// ===== GAS / SHEETS =====
+function saveGasUrl(){
+  const url=document.getElementById('gasUrlInput').value.trim();
+  localStorage.setItem(KEY.gasUrl,url);
+  updateGasStatus(url);
+}
+function updateGasStatus(url){
+  const el=document.getElementById('gasStatus');
+  if(el)el.style.display=url?'block':'none';
+}
+async function sendToSheets(){
+  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+  if(!gasUrl){
+    showToast('⚠️ 先に設定タブでGAS URLを登録してください');
+    setTimeout(()=>showPage('settings'),1200);
+    return;
+  }
+  const sv=document.getElementById('siteName').value;
+  const lv=document.getElementById('leaderSel').value;
+  if(!document.getElementById('workDate').value){showToast('⚠️ 作業日を入力してください');return;}
+  if(!sv||sv==='__other__'){showToast('⚠️ 現場名を選択してください');return;}
+  if(!lv||lv==='__new__'){showToast('⚠️ 責任者を選択してください');return;}
+
+  const payload={
+    workDate:document.getElementById('workDate').value,
+    site:sv,
+    weather:document.getElementById('weather').value,
+    leader:lv,
+    members:members.join('、'),
+    workType:document.getElementById('workType').value,
+    workDetail:document.getElementById('workDetail').value,
+    equipment:document.getElementById('equipment').value,
+    ppe:Array.from(ppeSelected).join('、'),
+    risks:risks.map((r,i)=>`【危険${i+1}】${r.danger} 対策：${r.countermeasure} レベル：${r.level==='high'?'高':r.level==='mid'?'中':'低'}`).join(' / '),
+    safetyGoal:document.getElementById('safetyGoal').value,
+    notes:document.getElementById('notes').value,
+    savedAt:new Date().toLocaleString('ja-JP'),
+  };
+
+  const params=new URLSearchParams(payload).toString();
+  const sendUrl=gasUrl+'?'+params;
+  const win=window.open(sendUrl,'_blank');
+  setTimeout(()=>{ try{win.close();}catch(e){} },3000);
+  // 送信済みフラグを記録に付ける
+  const allRecs=getRecords();
+  const wd=document.getElementById('workDate').value;
+  const sv2=document.getElementById('siteName').value;
+  const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===sv2);
+  if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
+  showToast('☁️ Googleスプレッドシートに送信しました！');
+}
+
+// ===== ⑤ 未送信カウント =====
+function getUnsentCount(){
+  return getRecords().filter(r=>!r.sent).length;
+}
+function updateUnsentBadge(){
+  const n=getUnsentCount();
+  let badge=document.getElementById('unsentBadge');
+  if(!badge){
+    badge=document.createElement('span');
+    badge.id='unsentBadge';
+    badge.style.cssText='background:var(--orange);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:4px;';
+    const listBtn=document.getElementById('tab-list-btn');
+    if(listBtn)listBtn.appendChild(badge);
+  }
+  badge.textContent=n>0?`未送信${n}`:'';
+  badge.style.display=n>0?'inline':'none';
+}
+
+// ===== ⑦ テンプレート（過去の危険ポイント引用） =====
+function openTplSheet(){
+  const recs=getRecords();
+  const allRisks=[];
+  recs.forEach(rec=>{
+    (rec.risks||[]).forEach(r=>{
+      if(r.danger&&r.danger.trim()){
+        allRisks.push({date:rec.workDate,site:rec.site,danger:r.danger,countermeasure:r.countermeasure,level:r.level});
+      }
+    });
+  });
+  const list=document.getElementById('tplList');
+  if(allRisks.length===0){
+    list.innerHTML='<div class="tpl-empty">過去の危険ポイントがまだありません。<br>記録を保存すると引用できるようになります。</div>';
+  }else{
+    // 重複を省いて最新20件
+    const seen=new Set();
+    const unique=allRisks.filter(r=>{
+      const k=r.danger.trim();
+      if(seen.has(k))return false;
+      seen.add(k);return true;
+    }).slice(0,20);
+    list.innerHTML=unique.map((r,i)=>{
+      const levelStr=r.level==='high'?'🔴 高':r.level==='mid'?'🟠 中':r.level==='low'?'🟢 低':'';
+      return`<div class="tpl-item" onclick="applyTemplate(${i})">
+        <div class="tpl-item-date">${r.date||''} ${r.site||''} ${levelStr}</div>
+        <div class="tpl-item-danger">${r.danger}</div>
+        ${r.countermeasure?`<div class="tpl-item-measure">🛡️ ${r.countermeasure}</div>`:''}
+      </div>`;
+    }).join('');
+    list._data=unique;
+  }
+  document.getElementById('tplOverlay').classList.add('open');
+}
+function closeTplSheet(e){
+  if(!e||e.target===document.getElementById('tplOverlay'))
+    document.getElementById('tplOverlay').classList.remove('open');
+}
+function applyTemplate(i){
+  const list=document.getElementById('tplList');
+  const item=list._data&&list._data[i];
+  if(!item)return;
+  // 新しいリスク行を追加して内容を設定
+  riskCount++;
+  const newRisk={id:'r'+riskCount,danger:item.danger,countermeasure:item.countermeasure||'',level:item.level||''};
+  risks.push(newRisk);
+  renderRisks();
+  save();
+  document.getElementById('tplOverlay').classList.remove('open');
+  showToast('✅ 危険ポイントを引用しました');
+  // セクション4を開く
+  const body4=document.getElementById('body4');
+  if(!body4.classList.contains('open')){toggleCard(4);}
+}
+
+// ===== ⑥ A4印刷 =====
+function buildPrintPreview(rec){
+  const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'';
+  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'－';
+  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):'－';
+  const risksHTML=(rec.risks||[]).map((r,i)=>{
+    const lvStr=r.level==='high'?'<span class="rb-print-high">●高</span>':r.level==='mid'?'<span class="rb-print-mid">●中</span>':r.level==='low'?'<span class="rb-print-low">●低</span>':'';
+    return`<div class="print-risk-block">
+      <div class="print-risk-num">危険ポイント ${i+1} ${lvStr}</div>
+      <div class="print-risk-danger">${r.danger||'－'}</div>
+      ${r.countermeasure?`<div class="print-risk-measure">🛡️ 対策：${r.countermeasure}</div>`:''}
+    </div>`;
+  }).join('');
+  return`<div class="print-page">
+    <div class="print-header">
+      <div class="print-logo">KY</div>
+      <div class="print-title">危険予知活動記録票</div>
+      <div class="print-date-box">作成：${new Date(rec.savedAt||Date.now()).toLocaleDateString('ja-JP')}</div>
+    </div>
+    <div class="print-section"><div class="print-section-title">基本情報</div>
+      <table class="print-table">
+        <tr><th>作業日</th><td>${dateStr}</td><th>天候</th><td>${rec.weather||'－'}</td></tr>
+        <tr><th>現場名</th><td colspan="3">${rec.site||'－'}</td></tr>
+      </table>
+    </div>
+    <div class="print-section"><div class="print-section-title">参加者</div>
+      <table class="print-table">
+        <tr><th>責任者</th><td>${rec.leader||'－'}</td><th>作業員</th><td>${mems}</td></tr>
+      </table>
+    </div>
+    <div class="print-section"><div class="print-section-title">作業内容</div>
+      <table class="print-table">
+        <tr><th>作業種別</th><td>${rec.workType||'－'}</td><th>機械・工具</th><td>${rec.equipment||'－'}</td></tr>
+        <tr><th>作業詳細</th><td colspan="3">${(rec.workDetail||'－').replace(/\n/g,'<br>')}</td></tr>
+        <tr><th>保護具</th><td colspan="3">${ppe}</td></tr>
+      </table>
+    </div>
+    <div class="print-section"><div class="print-section-title">危険ポイント・対策</div>${risksHTML}</div>
+    <div class="print-section"><div class="print-section-title">安全目標・連絡</div>
+      <table class="print-table">
+        <tr><th>安全目標</th><td>${rec.safetyGoal||'－'}</td></tr>
+        <tr><th>特記事項</th><td>${(rec.notes||'－').replace(/\n/g,'<br>')}</td></tr>
+      </table>
+    </div>
+    <div class="print-sign">
+      <div class="print-sign-box"><div class="print-sign-label">責任者確認</div><div class="print-sign-line">署名</div></div>
+      <div class="print-sign-box"><div class="print-sign-label">現場監督確認</div><div class="print-sign-line">署名</div></div>
+      <div class="print-sign-box"><div class="print-sign-label">安全管理者確認</div><div class="print-sign-line">署名</div></div>
+    </div>
+  </div>`;
+}
+
+// ===== ② 月次バックアップリマインダー =====
+function checkBackupReminder(){
+  const lastCheck=localStorage.getItem('ky_lastBackup')||'';
+  const now=new Date();
+  const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  if(lastCheck===ym)return;
+  const unsentCount=getUnsentCount();
+  if(unsentCount>0){
+    setTimeout(()=>{
+      showToast(`⚠️ 未送信の記録が${unsentCount}件あります`);
+    },2000);
+  }
+  localStorage.setItem('ky_lastBackup',ym);
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>

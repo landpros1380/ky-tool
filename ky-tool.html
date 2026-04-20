@@ -517,6 +517,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 // ===== KEYS =====
 const KEY={sites:'ky_sites',workers:'ky_workers',form:'ky_form',records:'ky_records',workTypes:'ky_workTypes',equips:'ky_equips',gasUrl:'ky_gasUrl'};
 
+// GAS URLをツールに埋め込む（変更時はここを書き換える）
+const DEFAULT_GAS_URL='https://script.google.com/macros/s/AKfycbwR-cSbbJBpuK58k9vVHohJ4Ilppk_DKTRVPZp6OTK-F8Wrv9_TOGTbYdrSs9_VacMi2A/exec';
+
 // ===== DEFAULT DATA =====
 const DEFAULT_WORK_TYPES=['掘削・土工事','基礎工事','鉄筋工事','型枠工事','コンクリート打設','鉄骨工事','内装工事','外装工事','電気工事','配管工事','高所作業','解体工事','その他'];
 const DEFAULT_EQUIPS=['バックホウ','クレーン','高所作業車','振動ローラー','コンクリートミキサー','電動ドリル','グラインダー','溶接機','チェーンブロック','足場','手工具一式','その他'];
@@ -555,8 +558,11 @@ function loadAll(){
   rebuildEquipSelect();
   renderWorkTypeSettings();
   renderEquipSettings();
-  // GAS URL
-  const savedUrl=localStorage.getItem(KEY.gasUrl)||'';
+  // GAS URL（localStorageになければ埋め込みURLを使う）
+  const savedUrl=localStorage.getItem(KEY.gasUrl)||DEFAULT_GAS_URL;
+  if(!localStorage.getItem(KEY.gasUrl)&&DEFAULT_GAS_URL){
+    localStorage.setItem(KEY.gasUrl,DEFAULT_GAS_URL);
+  }
   const gasInput=document.getElementById('gasUrlInput');
   if(gasInput){gasInput.value=savedUrl;updateGasStatus(savedUrl);}
 }

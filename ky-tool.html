@@ -1015,31 +1015,95 @@ function buildPreview(){
 function getRecords(){try{return JSON.parse(localStorage.getItem(KEY.records))||[];}catch(e){return[];}}
 function saveRecords(recs){localStorage.setItem(KEY.records,JSON.stringify(recs));}
 
+// ===== GASから記録一覧を取得（全員共有） =====
+let _gasRecordsCache=null; // キャッシュ
+let _gasRecordsLoading=false;
+
+function fetchGasRecords(callback){
+  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+  if(!gasUrl){ callback(null); return; }
+  if(_gasRecordsLoading) return;
+  _gasRecordsLoading=true;
+
+  const url=gasUrl+'?action=getRecords';
+  fetch(url)
+    .then(res=>res.json())
+    .then(json=>{
+      _gasRecordsLoading=false;
+      if(json.status==='ok'){
+        _gasRecordsCache=json.records||[];
+        callback(_gasRecordsCache);
+      } else {
+        callback(null);
+      }
+    })
+    .catch(()=>{ _gasRecordsLoading=false; callback(null); });
+}
+
 function updateSummary(){
-  const recs=getRecords();
+  // まずlocalStorageで即時表示、その後GASから更新
+  const localRecs=getRecords();
   const now=new Date();
   const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  document.getElementById('sum-total').textContent=recs.length;
-  document.getElementById('sum-month').textContent=recs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
-  document.getElementById('sum-high').textContent=recs.reduce((s,r)=>s+(r.risks||[]).filter(x=>x.level==='high').length,0);
-  const unsentN=recs.filter(r=>!r.sent).length;
+  document.getElementById('sum-total').textContent=localRecs.length;
+  document.getElementById('sum-month').textContent=localRecs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
+  document.getElementById('sum-high').textContent=localRecs.reduce((s,r)=>s+(r.risks||[]).filter(x=>x.level==='high').length,0);
+  const unsentN=localRecs.filter(r=>!r.sent).length;
   document.getElementById('sum-unsent').textContent=unsentN;
   updateUnsentBadge();
+
+  // GASからも取得して合計数を更新
+  fetchGasRecords(recs=>{
+    if(!recs) return;
+    document.getElementById('sum-total').textContent=recs.length;
+    document.getElementById('sum-month').textContent=recs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
+    document.getElementById('sum-high').textContent=recs.reduce((s,r)=>{
+      // GASの記録はrisksが文字列になっているので高リスク件数は別途カウント
+      const risksStr=String(r.risks||'');
+      return s+(risksStr.match(/レベル：高/g)||[]).length;
+    },0);
+  });
 }
 
 function renderList(){
-  const recs=getRecords();
+  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+  const container=document.getElementById('recordList');
   const fm=document.getElementById('filterMonth').value;
   const fs=document.getElementById('filterSite').value;
+
+  // まずlocalStorageの記録を即時表示
+  const localRecs=getRecords();
+  _renderRecordCards(localRecs,fm,fs,container,'local');
+
+  // GAS URLが設定されていれば全員の記録を取得
+  if(gasUrl){
+    container.insertAdjacentHTML('afterbegin',`<div id="gasLoadingMsg" style="text-align:center;padding:10px;font-size:12px;color:#888;font-weight:700;">☁️ スプレッドシートから記録を読み込み中…</div>`);
+    fetchGasRecords(recs=>{
+      const msg=document.getElementById('gasLoadingMsg');
+      if(msg)msg.remove();
+      if(recs){
+        _renderRecordCards(recs,fm,fs,container,'gas');
+      }
+    });
+  }
+}
+
+function _renderRecordCards(recs,fm,fs,container,source){
   let filtered=recs;
   if(fm)filtered=filtered.filter(r=>r.workDate&&r.workDate.startsWith(fm));
   if(fs)filtered=filtered.filter(r=>r.site===fs);
-  filtered.sort((a,b)=>b.workDate.localeCompare(a.workDate));
-  const container=document.getElementById('recordList');container.innerHTML='';
+  filtered.sort((a,b)=>(b.workDate||'').localeCompare(a.workDate||''));
+
+  // GAS取得時はコンテナをクリアして再描画
+  if(source==='gas') container.innerHTML='';
+
   if(filtered.length===0){
-    container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を完成・保存すると<br>ここに表示されます。</p></div>`;
+    if(source==='gas'||source==='local'){
+      container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を完成・保存すると<br>ここに表示されます。</p></div>`;
+    }
     updateSummary();return;
   }
+  if(source==='gas') container.innerHTML=''; // 再クリア（emptyメッセージを消す）
   filtered.forEach(rec=>{
     const d=new Date(rec.workDate+'T00:00:00');
     const month=`${d.getMonth()+1}月`;const day=d.getDate();
@@ -1073,14 +1137,20 @@ function renderList(){
       </div>`;
     container.appendChild(card);
   });
-  updateSummary();
+  if(source==='local') updateSummary();
 }
 
 function buildRecordDetailHTML(rec){
+  // GASからのデータはrisksが文字列の場合があるので安全に処理
+  let risksArr=rec.risks||[];
+  if(typeof risksArr==='string'){
+    // 文字列の場合はシンプルに表示
+    risksArr=[{danger:risksArr,countermeasure:'',level:''}];
+  }
   const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'－';
-  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'（なし）';
-  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):'－';
-  const risksHTML=(rec.risks||[]).map((r,i)=>{
+  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):(typeof rec.members==='string'?rec.members:'（なし）');
+  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):(typeof rec.ppe==='string'?rec.ppe:'－');
+  const risksHTML=risksArr.map((r,i)=>{
     const badge=r.level==='low'?'<span class="rb low">低</span>':r.level==='mid'?'<span class="rb mid">中</span>':r.level==='high'?'<span class="rb high">高</span>':'';
     return`<div class="detail-risk-block"><div class="detail-risk-label">⚠️ 危険ポイント ${i+1} ${badge}</div><div class="detail-risk-danger">${r.danger||'（未入力）'}</div><div class="detail-risk-measure">🛡️ 対策：${r.countermeasure||'－'}</div></div>`;
   }).join('')||'<p style="font-size:13px;color:#999">なし</p>';
@@ -1132,8 +1202,19 @@ function editRecord(id){
   save();showPage('form');updateProgress();showToast('✏️ 編集モードで読み込みました');
 }
 function deleteRecord(id){
-  if(!confirm('この記録を削除しますか？'))return;
+  if(!confirm('この記録を削除しますか？\n（スプレッドシート上の記録も削除されます）'))return;
+  // localStorageから削除
   saveRecords(getRecords().filter(r=>r.id!==id));
+  // GASからも削除
+  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+  if(gasUrl){
+    fetch(gasUrl,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'deleteRecord',id:id})
+    }).catch(()=>{});
+  }
+  _gasRecordsCache=null;
   renderList();showToast('🗑️ 記録を削除しました');
 }
 
@@ -1266,17 +1347,43 @@ async function sendToSheets(){
     savedAt:new Date().toLocaleString('ja-JP'),
   };
 
-  const params=new URLSearchParams(payload).toString();
-  const sendUrl=gasUrl+'?'+params;
-  const win=window.open(sendUrl,'_blank');
-  setTimeout(()=>{ try{win.close();}catch(e){} },3000);
-  // 送信済みフラグを記録に付ける
-  const allRecs=getRecords();
-  const wd=document.getElementById('workDate').value;
-  const sv2=document.getElementById('siteName').value;
-  const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===sv2);
-  if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
-  showToast('☁️ Googleスプレッドシートに送信しました！');
+  const btn=document.querySelector('.btn-sheets');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 送信中…';}
+
+  try{
+    const res=await fetch(gasUrl,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const json=await res.json();
+    if(json.status==='ok'){
+      // 送信済みフラグを記録に付ける
+      const allRecs=getRecords();
+      const wd=document.getElementById('workDate').value;
+      const sv2=document.getElementById('siteName').value;
+      const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===sv2);
+      if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
+      _gasRecordsCache=null; // キャッシュクリア
+      showToast('☁️ Googleスプレッドシートに送信しました！');
+    } else {
+      showToast('❌ 送信エラー：'+(json.msg||'不明なエラー'));
+    }
+  }catch(err){
+    // fetchが失敗した場合（CORSなど）は従来のウィンドウ方式にフォールバック
+    const params=new URLSearchParams(payload).toString();
+    const sendUrl=gasUrl+'?'+params;
+    const win=window.open(sendUrl,'_blank');
+    setTimeout(()=>{ try{win.close();}catch(e){} },3000);
+    const allRecs=getRecords();
+    const wd=document.getElementById('workDate').value;
+    const sv2=document.getElementById('siteName').value;
+    const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===sv2);
+    if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
+    showToast('☁️ Googleスプレッドシートに送信しました！');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='☁️ Googleスプレッドシートに送信';}
+  }
 }
 
 // ===== ⑤ 未送信カウント =====

@@ -1029,19 +1029,15 @@ function saveRecords(recs){localStorage.setItem(KEY.records,JSON.stringify(recs)
 
 // ===== GASから記録一覧を取得（全員共有） =====
 let _gasRecordsCache=null; // キャッシュ
-let _gasRecordsLoading=false;
 
 function fetchGasRecords(callback){
   const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
   if(!gasUrl){ callback(null); return; }
-  if(_gasRecordsLoading) return;
-  _gasRecordsLoading=true;
 
   const url=gasUrl+'?action=getRecords';
   fetch(url)
     .then(res=>res.json())
     .then(json=>{
-      _gasRecordsLoading=false;
       if(json.status==='ok'){
         _gasRecordsCache=json.records||[];
         callback(_gasRecordsCache);
@@ -1049,7 +1045,7 @@ function fetchGasRecords(callback){
         callback(null);
       }
     })
-    .catch(()=>{ _gasRecordsLoading=false; callback(null); });
+    .catch(()=>{ callback(null); });
 }
 
 function updateSummary(){
@@ -1083,39 +1079,47 @@ function renderList(){
   const fm=document.getElementById('filterMonth').value;
   const fs=document.getElementById('filterSite').value;
 
+  // 毎回コンテナをクリア（これが重複防止の要）
+  container.innerHTML='';
+
   // まずlocalStorageの記録を即時表示
   const localRecs=getRecords();
-  _renderRecordCards(localRecs,fm,fs,container,'local');
+  _renderRecordCards(localRecs,fm,fs,container);
+  updateSummary();
 
-  // GAS URLが設定されていれば全員の記録を取得
+  // GAS URLが設定されていれば全員の記録を取得して上書き
   if(gasUrl){
-    container.insertAdjacentHTML('afterbegin',`<div id="gasLoadingMsg" style="text-align:center;padding:10px;font-size:12px;color:#888;font-weight:700;">☁️ スプレッドシートから記録を読み込み中…</div>`);
+    const loadingEl=document.createElement('div');
+    loadingEl.id='gasLoadingMsg';
+    loadingEl.style.cssText='text-align:center;padding:10px;font-size:12px;color:#888;font-weight:700;';
+    loadingEl.textContent='☁️ スプレッドシートから全員の記録を読み込み中…';
+    container.insertAdjacentElement('afterbegin',loadingEl);
+
     fetchGasRecords(recs=>{
+      // ローディング表示を消す
       const msg=document.getElementById('gasLoadingMsg');
       if(msg)msg.remove();
-      if(recs){
-        _renderRecordCards(recs,fm,fs,container,'gas');
+      if(recs && recs.length>0){
+        // GASから取得できたら全件表示（localを上書き）
+        container.innerHTML='';
+        _renderRecordCards(recs,fm,fs,container);
+        updateSummary();
       }
+      // recs===null（取得失敗）ならlocalのまま表示継続
     });
   }
 }
 
-function _renderRecordCards(recs,fm,fs,container,source){
+function _renderRecordCards(recs,fm,fs,container){
   let filtered=recs;
   if(fm)filtered=filtered.filter(r=>r.workDate&&r.workDate.startsWith(fm));
   if(fs)filtered=filtered.filter(r=>r.site===fs);
   filtered.sort((a,b)=>(b.workDate||'').localeCompare(a.workDate||''));
 
-  // GAS取得時はコンテナをクリアして再描画
-  if(source==='gas') container.innerHTML='';
-
   if(filtered.length===0){
-    if(source==='gas'||source==='local'){
-      container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を完成・保存すると<br>ここに表示されます。</p></div>`;
-    }
-    updateSummary();return;
+    container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を完成・保存すると<br>ここに表示されます。</p></div>`;
+    return;
   }
-  if(source==='gas') container.innerHTML=''; // 再クリア（emptyメッセージを消す）
   filtered.forEach(rec=>{
     const d=new Date(rec.workDate+'T00:00:00');
     const month=`${d.getMonth()+1}月`;const day=d.getDate();
@@ -1149,8 +1153,8 @@ function _renderRecordCards(recs,fm,fs,container,source){
       </div>`;
     container.appendChild(card);
   });
-  if(source==='local') updateSummary();
 }
+
 
 function buildRecordDetailHTML(rec){
   // GASからのデータはrisksが文字列の場合があるので安全に処理
@@ -1364,54 +1368,35 @@ async function sendToSheets(){
   const btn=document.querySelector('.btn-sheets');
   if(btn){btn.disabled=true;btn.textContent='⏳ 送信中…';}
 
-  // JSONP方式でGASに送信（スマホのCORSを回避）
-  const cbName='_kyGasCb_'+Date.now();
-  const params=new URLSearchParams(payload).toString();
-  const sendUrl=gasUrl+'?'+params+'&callback='+cbName;
-
-  await new Promise((resolve)=>{
-    const timer=setTimeout(()=>{
-      // タイムアウト（10秒）→ 送信成功扱いにする（GASは受け取っている可能性が高い）
-      cleanup();
-      showToast('☁️ 送信しました（確認中）');
-      markAsSent();
-      resolve();
-    },10000);
-
-    function cleanup(){
-      clearTimeout(timer);
-      delete window[cbName];
-      const s=document.getElementById('_gasSendScript');
-      if(s)s.remove();
+  // GETパラメータで送信（スマホCORS回避・最もシンプルで確実な方法）
+  try{
+    const params=new URLSearchParams(payload).toString();
+    const sendUrl=gasUrl+'?'+params;
+    const res=await fetch(sendUrl);
+    const text=await res.text();
+    let json={status:'ok'};
+    try{ json=JSON.parse(text); }catch(e){}
+    if(json.status==='ok'){
+      markSent();
+      showToast('☁️ Googleスプレッドシートに送信しました！');
+    } else {
+      showToast('❌ 送信エラー：'+(json.msg||'不明'));
     }
-    function markAsSent(){
-      const allRecs=getRecords();
-      const wd=payload.workDate;
-      const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===payload.site);
-      if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
-      _gasRecordsCache=null;
-    }
+  }catch(err){
+    showToast('❌ 送信に失敗しました（通信エラー）');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='☁️ Googleスプレッドシートに送信';}
+  }
 
-    window[cbName]=function(json){
-      cleanup();
-      if(json&&json.status==='ok'){
-        markAsSent();
-        showToast('☁️ Googleスプレッドシートに送信しました！');
-      } else {
-        showToast('❌ 送信エラー：'+(json&&json.msg||'不明'));
-      }
-      resolve();
-    };
-
-    const script=document.createElement('script');
-    script.id='_gasSendScript';
-    script.src=sendUrl;
-    script.onerror=()=>{ cleanup(); showToast('❌ 送信に失敗しました'); resolve(); };
-    document.head.appendChild(script);
-  });
-
-  if(btn){btn.disabled=false;btn.textContent='☁️ Googleスプレッドシートに送信';}
+  function markSent(){
+    const allRecs=getRecords();
+    const wd=payload.workDate;
+    const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===payload.site);
+    if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
+    _gasRecordsCache=null;
+  }
 }
+
 
 // ===== ⑤ 未送信カウント =====
 function getUnsentCount(){

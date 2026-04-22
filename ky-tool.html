@@ -48,7 +48,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100
 .field{margin-top:14px;}
 label{display:block;font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
 .req{color:var(--red);margin-left:3px;}
-input[type="text"],input[type="date"],select,textarea{width:100%;border:2px solid var(--border);border-radius:10px;padding:11px 14px;font-size:16px;font-family:inherit;color:var(--dark);background:#fff;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+input[type="text"],input[type="date"],input[type="password"],select,textarea{width:100%;border:2px solid var(--border);border-radius:10px;padding:11px 14px;font-size:16px;font-family:inherit;color:var(--dark);background:#fff;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
 input:focus,select:focus,textarea:focus{border-color:var(--orange);}
 textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .add-row{display:none;gap:8px;margin-top:8px;}
@@ -99,9 +99,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 /* SUBMIT BUTTONS */
 .btn-submit{width:100%;background:linear-gradient(135deg,var(--yellow),var(--orange));color:var(--dark);border:none;border-radius:16px;padding:18px;font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:0.05em;box-shadow:0 4px 20px rgba(255,107,0,.4);margin-bottom:8px;transition:transform 0.1s;}
 .btn-submit:active{transform:scale(0.98);}
-.btn-sheets{width:100%;background:#1a73e8;color:#fff;border:none;border-radius:16px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:0.04em;margin-bottom:8px;}
-.btn-sheets:active{opacity:0.85;}
-.btn-sheets:disabled{background:#aaa;cursor:not-allowed;}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 .btn-reset{width:100%;background:transparent;border:2px solid #555;border-radius:16px;padding:14px;font-size:14px;font-weight:700;color:#aaa;cursor:pointer;font-family:inherit;margin-bottom:8px;}
 .btn-danger{width:100%;background:transparent;border:2px solid var(--red);border-radius:16px;padding:12px;font-size:13px;font-weight:700;color:var(--red);cursor:pointer;font-family:inherit;margin-bottom:8px;opacity:0.7;}
 
@@ -162,7 +160,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .list-empty .empty-icon{font-size:48px;margin-bottom:12px;}
 .list-empty p{font-size:14px;line-height:1.7;}
 
-/* ===== SETTINGS PAGE ===== */
+/* SETTINGS PAGE */
 .settings-page{padding:14px;max-width:600px;margin:0 auto;}
 .settings-section{background:#fff;border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);}
 .settings-section-header{background:var(--dark);padding:14px 16px;display:flex;align-items:center;gap:10px;}
@@ -185,12 +183,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .settings-hint{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.6;}
 .settings-reset-btn{width:100%;background:transparent;border:2px dashed var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:8px;}
 
-/* 送信済み・未送信バッジ */
-.sent-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px;}
-.sent-badge.sent{background:#E8F5E9;color:#2E7D32;}
-.sent-badge.unsent{background:#FFF3E0;color:#E65100;}
-.record-card.unsent-card{border-left:3px solid var(--orange);}
-
 /* テンプレートモーダル */
 .tpl-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:flex-end;pointer-events:none;visibility:hidden;}
 .tpl-overlay.open{pointer-events:auto;visibility:visible;}
@@ -204,10 +196,26 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .tpl-item-measure{font-size:12px;color:#555;margin-top:4px;}
 .tpl-empty{text-align:center;padding:32px;color:#aaa;font-size:13px;}
 
+/* PIN OVERLAY */
+.pin-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:1000;display:none;align-items:center;justify-content:center;}
+.pin-overlay.open{display:flex;}
+.pin-box{background:#fff;border-radius:20px;padding:28px 24px;width:290px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.pin-title{font-size:17px;font-weight:900;color:var(--dark);margin-bottom:6px;}
+.pin-sub{font-size:12px;color:var(--sub);margin-bottom:16px;}
+.pin-input{width:100%;border:2px solid var(--border);border-radius:10px;padding:12px;font-size:28px;text-align:center;letter-spacing:0.4em;font-family:inherit;outline:none;-webkit-appearance:none;}
+.pin-input:focus{border-color:var(--orange);}
+.pin-btn{width:100%;margin-top:12px;background:var(--dark);color:var(--yellow);border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;}
+.pin-error{color:var(--red);font-size:12px;font-weight:700;margin-top:8px;height:18px;}
+.pin-cancel{background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;margin-top:6px;font-family:inherit;display:block;width:100%;text-align:center;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.82);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:400;}
+.toast.show{opacity:1;}
+
 /* A4印刷レイアウト */
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .header,.progress-bar,.progress-label,.card,.btn-submit,.btn-sheets,.btn-reset,.btn-danger,
+  .header,.progress-bar,.progress-label,.card,.btn-submit,.btn-reset,.btn-danger,
   #page-list,#page-settings,.toast{display:none!important;}
   #preview-panel{display:block!important;box-shadow:none;padding:0;margin:0;border-radius:0;}
   body{background:#fff;font-family:'Noto Sans JP',sans-serif;}
@@ -351,76 +359,72 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
     </div>
   </div>
 
-  <button class="btn-submit" onclick="submitForm()">✅ KY記録を完成・保存</button>
-  <button class="btn-sheets" onclick="sendToSheets()">☁️ Googleスプレッドシートに送信</button>
+  <button class="btn-submit" id="submitBtn" onclick="submitForm()">✅ KY記録を完成・保存</button>
   <button class="btn-reset" onclick="resetToday()">🔄 今日の入力をリセット</button>
-  <button class="btn-danger" onclick="clearAllData()">🗑️ すべてのデータを消去</button>
+  <button class="btn-danger" onclick="clearLocalData()">🗑️ ローカルデータを消去</button>
 
   <div id="preview-panel">
     <div class="preview-title">⚠️ KY 活動記録票</div>
     <div id="preview-content"></div>
   </div>
-
 </div>
 </div>
 
-<!-- ===== 一覧ページ ===== -->
+<!-- ===== 一覧ページ（管理者のみ） ===== -->
 <div class="page" id="page-list">
 <div class="list-page">
   <div class="list-summary">
     <div class="summary-card"><div class="s-num" id="sum-total">0</div><div class="s-label">総記録数</div></div>
     <div class="summary-card"><div class="s-num" id="sum-month">0</div><div class="s-label">今月の記録</div></div>
     <div class="summary-card"><div class="s-num" id="sum-high" style="color:var(--red)">0</div><div class="s-label">高リスク件数</div></div>
-    <div class="summary-card"><div class="s-num" id="sum-unsent" style="color:var(--orange)">0</div><div class="s-label">未送信件数</div></div>
   </div>
   <div class="list-filter">
-    <input type="month" id="filterMonth" onchange="renderList()">
-    <select id="filterSite" onchange="renderList()"><option value="">すべての現場</option></select>
+    <input type="month" id="filterMonth" onchange="applyFilter()">
+    <select id="filterSite" onchange="applyFilter()"><option value="">すべての現場</option></select>
   </div>
   <div id="recordList"></div>
 </div>
 </div>
 
-<!-- ===== 設定ページ ===== -->
+<!-- ===== 設定ページ（管理者のみ） ===== -->
 <div class="page" id="page-settings">
 <div class="settings-page">
 
-  <!-- 作業種別 -->
+  <!-- Firebase状態 -->
   <div class="settings-section">
     <div class="settings-section-header">
-      <span class="s-icon">☁️</span>
-      <h2>Googleスプレッドシート連携</h2>
+      <span class="s-icon">🔥</span>
+      <h2>Firebase 接続状態</h2>
     </div>
     <div class="settings-section-body">
-      <p style="font-size:13px;line-height:1.8;color:#444;margin-bottom:12px">
-        Google Apps Script（GAS）のウェブアプリURLを登録すると、<br>
-        「☁️ Googleスプレッドシートに送信」ボタンでKY記録を自動送信できます。
-      </p>
-      <div class="field" style="margin-top:0">
-        <label>GAS ウェブアプリ URL</label>
-        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." oninput="saveGasUrl()">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-size:13px;font-weight:700;color:#444;">接続状態：</span>
+        <span id="fbStatusBadge" style="padding:4px 14px;border-radius:20px;font-size:13px;font-weight:700;background:#FFF8E1;color:#7B5800;">⏳ 確認中</span>
       </div>
-      <p class="settings-hint" style="margin-top:8px">
-        ⓘ 設定手順書（付属のWordファイル）を参照してURLを取得・貼り付けてください
-      </p>
-      <div id="gasStatus" style="margin-top:10px;font-size:13px;font-weight:700;color:var(--green);display:none">✅ URL登録済み</div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-        <p style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:8px">📥 マスターデータの同期</p>
-        <p style="font-size:12px;color:#555;line-height:1.7;margin-bottom:10px">
-          スプレッドシートの「マスター」シートに書いた<br>
-          現場名・作業員名をKYツールに読み込みます。<br>
-          管理者がスプレッドシートを更新したあと、<br>このボタンを押すと最新のリストに反映されます。
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
+        <p style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:8px;">📋 未設定の場合の設定方法</p>
+        <p style="font-size:12px;color:#444;line-height:2.0;">
+          ① <b>console.firebase.google.com</b> でプロジェクト作成<br>
+          ② Firestoreデータベースを作成（テストモード）<br>
+          ③ プロジェクト設定 → ウェブアプリ追加 → Config をコピー<br>
+          ④ このHTMLの <code style="background:#f0f0f0;padding:2px 5px;border-radius:3px;">firebaseConfig</code> に貼り付け
         </p>
-        <button onclick="syncMaster()" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.04em;">
-          📥 スプレッドシートから現場・作業員を読み込む
-        </button>
-        <div id="syncStatus" style="margin-top:8px;font-size:12px;font-weight:700;text-align:center;display:none"></div>
-        <div id="masterPasteArea" style="display:none;margin-top:10px;">
-          <p style="font-size:12px;color:#1565C0;font-weight:700;margin-bottom:6px;">👆 開いたタブの内容をすべてコピーして下に貼り付けてください</p>
-          <textarea id="masterPasteInput" placeholder='{"status":"ok","sites":[...],"workers":[...]}' style="width:100%;border:2px solid #1565C0;border-radius:10px;padding:10px;font-size:13px;font-family:inherit;min-height:80px;outline:none;resize:vertical;-webkit-appearance:none;"></textarea>
-          <button onclick="applyMasterData()" style="width:100%;margin-top:8px;background:#1565C0;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">✅ 貼り付けた内容を反映する</button>
-        </div>
-        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理者設定 -->
+  <div class="settings-section">
+    <div class="settings-section-header">
+      <span class="s-icon">🔒</span>
+      <h2>管理者設定</h2>
+    </div>
+    <div class="settings-section-body">
+      <p style="font-size:13px;color:#444;line-height:1.8;margin-bottom:12px;">
+        一覧・設定ページはPINコードで保護されています。<br>
+        HTMLファイル内の <code style="background:#f0f0f0;padding:2px 5px;border-radius:3px;">ADMIN_PIN</code> の値を変更してください。
+      </p>
+      <button onclick="adminLogout()" style="width:100%;background:transparent;border:2px solid #555;border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:#555;cursor:pointer;font-family:inherit;">🔓 このセッションからログアウト</button>
     </div>
   </div>
 
@@ -458,7 +462,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
     </div>
   </div>
 
-  <!-- ③ URL運用ガイド -->
+  <!-- URL運用ガイド -->
   <div class="settings-section" style="border:2px solid var(--orange);">
     <div class="settings-section-header" style="background:var(--orange);">
       <span class="s-icon">🌐</span>
@@ -469,7 +473,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
         このHTMLファイルをGoogleドライブに置いてURLで開くと、<br>
         <b>ファイルを配布し直さなくても全員が常に最新版を使えます。</b>
       </p>
-      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;">
         <p style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:8px">📋 設定手順</p>
         <p style="font-size:12px;color:#444;line-height:2.0">
           ① Googleドライブを開いてHTMLファイルをアップロード<br>
@@ -479,25 +483,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
           ⑤ 次回からはツールを更新したファイルをドライブに上書きするだけ
         </p>
       </div>
-      <div style="background:#E8F5E9;border-radius:10px;padding:10px 14px;margin-bottom:10px;">
-        <p style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:6px">✅ メリット</p>
-        <p style="font-size:12px;color:#333;line-height:1.8">
-          ・新機能追加のたびにファイルを全員に配布しなくてよい<br>
-          ・全員が同じ最新版を使えるので混乱がない<br>
-          ・マスター同期が安定しやすくなる
-        </p>
-      </div>
-      <div style="background:#FFF8E1;border-radius:10px;padding:10px 14px;">
-        <p style="font-size:12px;font-weight:700;color:#7B5800;margin-bottom:6px">⚠️ 注意</p>
-        <p style="font-size:12px;color:#555;line-height:1.8">
-          ・Googleドライブから開く場合、データは<b>各自のスマホ内</b>に保存されます<br>
-          ・機種変更の前には必ずスプレッドシートへ送信してバックアップを取ってください
-        </p>
-      </div>
     </div>
   </div>
 
 </div>
+</div>
+
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <div class="pin-title">🔒 管理者ログイン</div>
+    <div class="pin-sub">PINコードを入力してください</div>
+    <input type="password" class="pin-input" id="pinInput" maxlength="8" inputmode="numeric" onkeydown="if(event.key==='Enter')checkPin()">
+    <div class="pin-error" id="pinError"></div>
+    <button class="pin-btn" onclick="checkPin()">確認</button>
+    <button class="pin-cancel" onclick="closePinDialog()">キャンセル</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -513,168 +514,197 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-// ===== KEYS =====
-const KEY={sites:'ky_sites',workers:'ky_workers',form:'ky_form',records:'ky_records',workTypes:'ky_workTypes',equips:'ky_equips',gasUrl:'ky_gasUrl'};
-
-// GAS URLをツールに埋め込む（変更時はここを書き換える）
-const DEFAULT_GAS_URL='https://script.google.com/macros/s/AKfycbwR-cSbbJBpuK58k9vVHohJ4Ilppk_DKTRVPZp6OTK-F8Wrv9_TOGTbYdrSs9_VacMi2A/exec';
-
-// ===== DEFAULT DATA =====
-const DEFAULT_WORK_TYPES=['掘削・土工事','基礎工事','鉄筋工事','型枠工事','コンクリート打設','鉄骨工事','内装工事','外装工事','電気工事','配管工事','高所作業','解体工事','その他'];
-const DEFAULT_EQUIPS=['バックホウ','クレーン','高所作業車','振動ローラー','コンクリートミキサー','電動ドリル','グラインダー','溶接機','チェーンブロック','足場','手工具一式','その他'];
-const DEFAULT_SITES=['〇〇ビル新築工事','△△マンション改修工事','□□道路工事'];
-const PPE_ITEMS=['ヘルメット','安全帯','安全靴','手袋','防塵マスク','保護メガネ','蛍光ベスト','耳栓'];
-
-// ===== STATE =====
-let sites=[],workers=[],workTypes=[],equips=[];
-let members=[],risks=[],riskCount=0,ppeSelected=new Set();
-let _editingId=null; // 編集中の記録ID（nullなら新規）
-
-// ===== INIT =====
-window.onload=function(){
-  loadAll();
-  buildPPE();
-  loadForm();
-  if(risks.length===0)addRisk();
-  updateProgress();
-  const now=new Date();
-  document.getElementById('filterMonth').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  updateUnsentBadge();
-  checkBackupReminder();
-  // 起動時にマスター自動同期（GAS URLが登録済みの場合のみ）
-  autoSyncMaster();
+// =========================================================
+// ★ STEP 1: Firebaseコンソールから取得したconfigを貼り付けてください
+// =========================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDDQZXQu2Q7kYnkPztizIYz_krVGZ0DlXo",
+  authDomain: "ky-tool.firebaseapp.com",
+  projectId: "ky-tool",
+  storageBucket: "ky-tool.firebasestorage.app",
+  messagingSenderId: "710881026208",
+  appId: "1:710881026208:web:ed45077af63bd44951a9c5"
 };
 
-// ===== LOAD ALL MASTERS =====
-function loadAll(){
-  try{sites=JSON.parse(localStorage.getItem(KEY.sites))||DEFAULT_SITES.slice();}catch(e){sites=DEFAULT_SITES.slice();}
-  try{workers=JSON.parse(localStorage.getItem(KEY.workers))||[];}catch(e){workers=[];}
-  try{workTypes=JSON.parse(localStorage.getItem(KEY.workTypes))||DEFAULT_WORK_TYPES.slice();}catch(e){workTypes=DEFAULT_WORK_TYPES.slice();}
-  try{equips=JSON.parse(localStorage.getItem(KEY.equips))||DEFAULT_EQUIPS.slice();}catch(e){equips=DEFAULT_EQUIPS.slice();}
-  rebuildSiteSelect();
-  rebuildLeaderSelect();
-  rebuildWorkerSelect();
-  rebuildWorkTypeSelect();
-  rebuildEquipSelect();
-  renderWorkTypeSettings();
-  renderEquipSettings();
-  // GAS URL（localStorageになければ埋め込みURLを使う）
-  const savedUrl=localStorage.getItem(KEY.gasUrl)||DEFAULT_GAS_URL;
-  if(!localStorage.getItem(KEY.gasUrl)&&DEFAULT_GAS_URL){
-    localStorage.setItem(KEY.gasUrl,DEFAULT_GAS_URL);
+// =========================================================
+// ★ STEP 2: 管理者PINコードを変更してください（4〜8桁）
+// =========================================================
+const ADMIN_PIN = '1234';
+
+// ===== Firebase初期化 =====
+let db;
+let _fbReady = false;
+try {
+  if (firebaseConfig.apiKey !== 'YOUR_API_KEY') {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    _fbReady = true;
   }
-  const gasInput=document.getElementById('gasUrlInput');
-  if(gasInput){gasInput.value=savedUrl;updateGasStatus(savedUrl);}
-}
-function saveMasters(){
-  localStorage.setItem(KEY.sites,JSON.stringify(sites));
-  localStorage.setItem(KEY.workers,JSON.stringify(workers));
-  localStorage.setItem(KEY.workTypes,JSON.stringify(workTypes));
-  localStorage.setItem(KEY.equips,JSON.stringify(equips));
-}
+} catch(e) { console.error('Firebase init error:', e); }
 
-// ===== 起動時マスター自動同期 =====
-function autoSyncMaster(){
-  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
-  if(!gasUrl) return; // URL未登録なら何もしない
+// ===== デフォルトデータ =====
+const DEFAULT_WORK_TYPES = ['掘削・土工事','基礎工事','鉄筋工事','型枠工事','コンクリート打設','鉄骨工事','内装工事','外装工事','電気工事','配管工事','高所作業','解体工事','その他'];
+const DEFAULT_EQUIPS = ['バックホウ','クレーン','高所作業車','振動ローラー','コンクリートミキサー','電動ドリル','グラインダー','溶接機','チェーンブロック','足場','手工具一式','その他'];
+const DEFAULT_SITES = ['〇〇ビル新築工事','△△マンション改修工事','□□道路工事'];
+const PPE_ITEMS = ['ヘルメット','安全帯','安全靴','手袋','防塵マスク','保護メガネ','蛍光ベスト','耳栓'];
 
-  // 前回同期から10分以上経過していれば同期する
-  const lastSync=parseInt(localStorage.getItem('ky_lastAutoSync')||'0');
-  const now=Date.now();
-  if(now - lastSync < 10*60*1000) return; // 10分以内は skip
+// ===== 状態 =====
+let sites=[], workers=[], workTypes=[], equips=[];
+let members=[], risks=[], riskCount=0, ppeSelected=new Set();
+let _editingId=null;
+let isAdminUnlocked=false;
+let _pendingPage=null;
+let _recordsCache=[];
 
-  // バナーを表示
-  showSyncBanner('⏳ 現場・作業員リストを更新中…');
+// ===== 初期化 =====
+window.onload = async function(){
+  isAdminUnlocked = sessionStorage.getItem('ky_admin') === '1';
+  await loadAll();
+  buildPPE();
+  loadForm();
+  if(risks.length===0) addRisk();
+  updateProgress();
+  const now = new Date();
+  document.getElementById('filterMonth').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  updateFbStatus();
+};
 
-  fetch(gasUrl+'?action=getMaster')
-    .then(res=>res.json())
-    .then(json=>{
-      if(json.status!=='ok') throw new Error(json.msg||'error');
-      let changed=false;
-      if(json.sites&&json.sites.length>0){
-        sites=json.sites;
-        localStorage.setItem(KEY.sites,JSON.stringify(sites));
-        rebuildSiteSelect();
-        changed=true;
-      }
-      if(json.workers&&json.workers.length>0){
-        workers=json.workers;
-        localStorage.setItem(KEY.workers,JSON.stringify(workers));
-        rebuildLeaderSelect();
-        rebuildWorkerSelect();
-        changed=true;
-      }
-      localStorage.setItem('ky_lastAutoSync', String(Date.now()));
-      if(changed){
-        showSyncBanner('✅ リスト更新完了！');
-      } else {
-        hideSyncBanner();
-      }
-      setTimeout(hideSyncBanner, 3000);
-    })
-    .catch(()=>{
-      // 自動同期は失敗しても無視（手動で設定タブから実行可能）
-      hideSyncBanner();
-    });
-}
-
-function showSyncBanner(msg){
-  let banner=document.getElementById('syncBanner');
-  if(!banner){
-    banner=document.createElement('div');
-    banner.id='syncBanner';
-    banner.style.cssText='position:fixed;top:60px;left:0;right:0;background:#1a1a1a;color:#FFD600;text-align:center;padding:8px;font-size:12px;font-weight:700;z-index:300;letter-spacing:0.04em;';
-    document.body.appendChild(banner);
+// ===== Firebase状態表示 =====
+function updateFbStatus(){
+  const el = document.getElementById('fbStatusBadge');
+  if(!el) return;
+  if(_fbReady){
+    el.style.background = '#E8F5E9'; el.style.color = '#2E7D32';
+    el.textContent = '✅ 接続済み・正常動作中';
+  } else {
+    el.style.background = '#FFEBEE'; el.style.color = '#C62828';
+    el.textContent = '❌ 未設定 — configを入力してください';
   }
-  banner.textContent=msg;
-  banner.style.display='block';
-}
-function hideSyncBanner(){
-  const b=document.getElementById('syncBanner');
-  if(b) b.style.display='none';
 }
 
-// ===== PAGE SWITCH =====
+// ===== PIN管理 =====
+function openPinDialog(targetPage){
+  _pendingPage = targetPage || null;
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pinInput').focus(), 100);
+}
+function closePinDialog(){
+  document.getElementById('pinOverlay').classList.remove('open');
+  _pendingPage = null;
+}
+function checkPin(){
+  const val = document.getElementById('pinInput').value;
+  if(val === ADMIN_PIN){
+    isAdminUnlocked = true;
+    sessionStorage.setItem('ky_admin', '1');
+    document.getElementById('pinOverlay').classList.remove('open');
+    if(_pendingPage){ const p=_pendingPage; _pendingPage=null; showPage(p); }
+  } else {
+    document.getElementById('pinError').textContent = 'PINが違います';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+  }
+}
+function adminLogout(){
+  isAdminUnlocked = false;
+  sessionStorage.removeItem('ky_admin');
+  showPage('form');
+  showToast('🔓 ログアウトしました');
+}
+
+// ===== ページ切替 =====
 function showPage(p){
+  if((p==='list'||p==='settings') && !isAdminUnlocked){
+    openPinDialog(p);
+    return;
+  }
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   ['form','list','settings'].forEach(t=>{
-    document.getElementById('tab-'+t+'-btn').classList.toggle('active-tab',t===p);
+    document.getElementById('tab-'+t+'-btn').classList.toggle('active-tab', t===p);
   });
-  if(p==='list'){renderList();updateSummary();}
-  if(p==='settings'){renderWorkTypeSettings();renderEquipSettings();}
+  if(p==='list'){ renderList(); updateSummary(); }
+  if(p==='settings'){ renderWorkTypeSettings(); renderEquipSettings(); updateFbStatus(); }
 }
 
-// ===== CARD =====
+// ===== カード開閉 =====
 function toggleCard(n){
   document.getElementById('body'+n).classList.toggle('open');
   document.getElementById('chev'+n).classList.toggle('open');
 }
 
-// ===== SELECTS =====
+// ===== マスターデータ読み込み =====
+async function loadAll(){
+  if(_fbReady){
+    try{
+      const doc = await db.collection('kyMasters').doc('data').get();
+      if(doc.exists){
+        const d = doc.data();
+        sites = d.sites || DEFAULT_SITES.slice();
+        workers = d.workers || [];
+        workTypes = d.workTypes || DEFAULT_WORK_TYPES.slice();
+        equips = d.equips || DEFAULT_EQUIPS.slice();
+      } else {
+        sites=DEFAULT_SITES.slice(); workers=[];
+        workTypes=DEFAULT_WORK_TYPES.slice(); equips=DEFAULT_EQUIPS.slice();
+        db.collection('kyMasters').doc('data').set({sites,workers,workTypes,equips});
+      }
+    } catch(e){
+      console.warn('Firestore load failed, using localStorage fallback');
+      _loadLocal();
+    }
+  } else {
+    _loadLocal();
+  }
+  rebuildSiteSelect(); rebuildLeaderSelect(); rebuildWorkerSelect();
+  rebuildWorkTypeSelect(); rebuildEquipSelect();
+  renderWorkTypeSettings(); renderEquipSettings();
+}
+
+function _loadLocal(){
+  try{sites=JSON.parse(localStorage.getItem('ky_sites'))||DEFAULT_SITES.slice();}catch(e){sites=DEFAULT_SITES.slice();}
+  try{workers=JSON.parse(localStorage.getItem('ky_workers'))||[];}catch(e){workers=[];}
+  try{workTypes=JSON.parse(localStorage.getItem('ky_workTypes'))||DEFAULT_WORK_TYPES.slice();}catch(e){workTypes=DEFAULT_WORK_TYPES.slice();}
+  try{equips=JSON.parse(localStorage.getItem('ky_equips'))||DEFAULT_EQUIPS.slice();}catch(e){equips=DEFAULT_EQUIPS.slice();}
+}
+
+async function saveMasters(){
+  localStorage.setItem('ky_sites', JSON.stringify(sites));
+  localStorage.setItem('ky_workers', JSON.stringify(workers));
+  localStorage.setItem('ky_workTypes', JSON.stringify(workTypes));
+  localStorage.setItem('ky_equips', JSON.stringify(equips));
+  if(_fbReady){
+    try{ await db.collection('kyMasters').doc('data').set({sites,workers,workTypes,equips}); }
+    catch(e){ console.warn('saveMasters Firestore failed'); }
+  }
+}
+
+// ===== セレクトボックス再構築 =====
 function rebuildSiteSelect(){
-  const sel=document.getElementById('siteName');const cur=sel.value;
+  const sel=document.getElementById('siteName'); const cur=sel.value;
   sel.innerHTML='<option value="">現場を選択してください</option>';
-  sites.forEach(s=>{const o=new Option(s,s);sel.add(o);});
+  sites.forEach(s=>sel.add(new Option(s,s)));
   sel.add(new Option('＋ 新しい現場を追加…','__other__'));
-  if(cur)sel.value=cur;
-  const fs=document.getElementById('filterSite');if(!fs)return;
-  const fc=fs.value;fs.innerHTML='<option value="">すべての現場</option>';
-  sites.forEach(s=>{fs.add(new Option(s,s));});if(fc)fs.value=fc;
+  if(cur) sel.value=cur;
+  const fs=document.getElementById('filterSite'); if(!fs) return;
+  const fc=fs.value; fs.innerHTML='<option value="">すべての現場</option>';
+  sites.forEach(s=>fs.add(new Option(s,s))); if(fc) fs.value=fc;
 }
 function rebuildLeaderSelect(){
-  const sel=document.getElementById('leaderSel');const cur=sel.value;
+  const sel=document.getElementById('leaderSel'); const cur=sel.value;
   sel.innerHTML='<option value="">責任者を選択してください</option>';
   workers.forEach(w=>sel.add(new Option(w,w)));
   sel.add(new Option('＋ 新しい人を登録…','__new__'));
-  if(cur)sel.value=cur;
+  if(cur) sel.value=cur;
 }
-function rebuildWorkerSelect(){renderWorkerChecks();}
-
+function rebuildWorkerSelect(){ renderWorkerChecks(); }
 function renderWorkerChecks(){
-  const list=document.getElementById('workerCheckList');
-  if(!list)return;
+  const list=document.getElementById('workerCheckList'); if(!list) return;
   if(workers.length===0){
     list.innerHTML='<div class="worker-empty">作業員が登録されていません<br>下の「＋ 新しい作業員を登録」から追加してください</div>';
     return;
@@ -684,121 +714,112 @@ function renderWorkerChecks(){
     const isChecked=members.includes(name);
     const item=document.createElement('div');
     item.className='worker-check-item'+(isChecked?' checked':'');
-    item.innerHTML=`
-      <div class="wc-box${isChecked?' on':''}">
-        <div class="wc-mark"></div>
-      </div>
-      <span class="wc-name">${name}</span>`;
+    item.innerHTML=`<div class="wc-box${isChecked?' on':''}"><div class="wc-mark"></div></div><span class="wc-name">${name}</span>`;
     item.onclick=()=>toggleWorker(name);
     list.appendChild(item);
   });
 }
-
 function toggleWorker(name){
-  if(members.includes(name)){
-    members=members.filter(m=>m!==name);
-  }else{
-    members.push(name);
-  }
-  renderWorkerChecks();
-  renderTags();
-  save();
+  if(members.includes(name)) members=members.filter(m=>m!==name);
+  else members.push(name);
+  renderWorkerChecks(); renderTags(); save();
 }
 function rebuildWorkTypeSelect(){
-  const sel=document.getElementById('workType');const cur=sel.value;
+  const sel=document.getElementById('workType'); const cur=sel.value;
   sel.innerHTML='<option value="">作業を選択</option>';
-  workTypes.forEach(t=>sel.add(new Option(t,t)));
-  if(cur)sel.value=cur;
+  workTypes.forEach(t=>sel.add(new Option(t,t))); if(cur) sel.value=cur;
 }
 function rebuildEquipSelect(){
-  const sel=document.getElementById('equipment');const cur=sel.value;
+  const sel=document.getElementById('equipment'); const cur=sel.value;
   sel.innerHTML='<option value="">機械・工具を選択</option>';
-  equips.forEach(e=>sel.add(new Option(e,e)));
-  if(cur)sel.value=cur;
+  equips.forEach(e=>sel.add(new Option(e,e))); if(cur) sel.value=cur;
 }
 
 // ===== 現場 =====
 function onSiteChange(){
   const v=document.getElementById('siteName').value;
   document.getElementById('siteAddRow').style.display=v==='__other__'?'flex':'none';
-  if(v==='__other__')document.getElementById('siteInput').focus();
-  save();updateProgress();
+  if(v==='__other__') document.getElementById('siteInput').focus();
+  save(); updateProgress();
 }
 function addSite(){
-  const input=document.getElementById('siteInput');const name=input.value.trim();
+  const input=document.getElementById('siteInput'); const name=input.value.trim();
   if(!name){showToast('⚠️ 現場名を入力してください');return;}
   if(sites.includes(name)){showToast('すでに登録されています');return;}
-  sites.push(name);saveMasters();rebuildSiteSelect();
+  sites.push(name); saveMasters(); rebuildSiteSelect();
   document.getElementById('siteName').value=name;
   document.getElementById('siteAddRow').style.display='none';
-  input.value='';save();updateProgress();showToast('✅ 現場を追加しました');
+  input.value=''; save(); updateProgress(); showToast('✅ 現場を追加しました');
 }
 
 // ===== 責任者 =====
 function onLeaderChange(){
   const v=document.getElementById('leaderSel').value;
   document.getElementById('leaderAddRow').style.display=v==='__new__'?'flex':'none';
-  if(v==='__new__')document.getElementById('leaderInput').focus();
-  save();updateProgress();
+  if(v==='__new__') document.getElementById('leaderInput').focus();
+  save(); updateProgress();
 }
 function addLeader(){
-  const input=document.getElementById('leaderInput');const name=input.value.trim();
+  const input=document.getElementById('leaderInput'); const name=input.value.trim();
   if(!name){showToast('⚠️ 氏名を入力してください');return;}
   if(!workers.includes(name)){workers.push(name);saveMasters();rebuildLeaderSelect();rebuildWorkerSelect();}
   document.getElementById('leaderSel').value=name;
   document.getElementById('leaderAddRow').style.display='none';
-  input.value='';save();updateProgress();showToast('✅ 登録しました');
+  input.value=''; save(); updateProgress(); showToast('✅ 登録しました');
 }
 
 // ===== 作業員 =====
 function toggleWorkerAdd(){
   const row=document.getElementById('workerAddRow');
   row.style.display=row.style.display==='flex'?'none':'flex';
-  if(row.style.display==='flex')document.getElementById('workerInput').focus();
+  if(row.style.display==='flex') document.getElementById('workerInput').focus();
 }
 function addNewWorker(){
-  const input=document.getElementById('workerInput');const name=input.value.trim();
+  const input=document.getElementById('workerInput'); const name=input.value.trim();
   if(!name){showToast('⚠️ 氏名を入力してください');return;}
   if(!workers.includes(name)){workers.push(name);saveMasters();rebuildLeaderSelect();}
-  if(!members.includes(name)){members.push(name);}
-  renderWorkerChecks();
-  renderTags();
-  input.value='';document.getElementById('workerAddRow').style.display='none';
-  save();showToast('✅ 作業員を登録・追加しました');
+  if(!members.includes(name)) members.push(name);
+  renderWorkerChecks(); renderTags();
+  input.value=''; document.getElementById('workerAddRow').style.display='none';
+  save(); showToast('✅ 作業員を登録・追加しました');
 }
-function removeMember(name){members=members.filter(m=>m!==name);renderWorkerChecks();renderTags();save();}
+function removeMember(name){ members=members.filter(m=>m!==name); renderWorkerChecks(); renderTags(); save(); }
 function renderTags(){
-  const c=document.getElementById('memberTags');c.innerHTML='';
+  const c=document.getElementById('memberTags'); c.innerHTML='';
   members.forEach(name=>{
-    const t=document.createElement('div');t.className='tag';
+    const t=document.createElement('div'); t.className='tag';
     t.innerHTML=`${name}<button class="tag-x" onclick="removeMember('${name}')">✕</button>`;
     c.appendChild(t);
   });
 }
 
-// ===== PPE =====
+// ===== 保護具 =====
 function buildPPE(){
   const wrap=document.getElementById('ppeWrap');
   PPE_ITEMS.forEach(item=>{
-    const btn=document.createElement('button');btn.type='button';btn.className='ppe-btn';btn.dataset.item=item;btn.textContent=item;
-    btn.onclick=()=>{if(ppeSelected.has(item)){ppeSelected.delete(item);btn.classList.remove('on');}else{ppeSelected.add(item);btn.classList.add('on');}save();};
+    const btn=document.createElement('button'); btn.type='button'; btn.className='ppe-btn'; btn.dataset.item=item; btn.textContent=item;
+    btn.onclick=()=>{
+      if(ppeSelected.has(item)){ppeSelected.delete(item);btn.classList.remove('on');}
+      else{ppeSelected.add(item);btn.classList.add('on');}
+      save();
+    };
     wrap.appendChild(btn);
   });
 }
 
-// ===== RISKS =====
-function addRisk(){riskCount++;risks.push({id:'r'+riskCount,danger:'',countermeasure:'',level:''});renderRisks();save();updateProgress();}
-function removeRisk(id){risks=risks.filter(r=>r.id!==id);renderRisks();save();}
-function updateRisk(id,field,val){const r=risks.find(r=>r.id===id);if(r){r[field]=val;save();}}
+// ===== 危険ポイント =====
+function addRisk(){ riskCount++; risks.push({id:'r'+riskCount,danger:'',countermeasure:'',level:''}); renderRisks(); save(); updateProgress(); }
+function removeRisk(id){ risks=risks.filter(r=>r.id!==id); renderRisks(); save(); }
+function updateRisk(id,field,val){ const r=risks.find(r=>r.id===id); if(r){r[field]=val;save();} }
 function setRiskLevel(id,level,btn){
-  const r=risks.find(r=>r.id===id);if(r)r.level=level;
+  const r=risks.find(r=>r.id===id); if(r) r.level=level;
   btn.closest('.risk-level').querySelectorAll('.rl-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');save();
+  btn.classList.add('active'); save();
 }
 function renderRisks(){
-  const list=document.getElementById('riskList');list.innerHTML='';
+  const list=document.getElementById('riskList'); list.innerHTML='';
   risks.forEach((r,i)=>{
-    const div=document.createElement('div');div.className='risk-row';
+    const div=document.createElement('div'); div.className='risk-row';
     div.innerHTML=`
       <div class="risk-row-header"><span class="risk-row-num">⚠️ 危険ポイント ${i+1}</span>${risks.length>1?`<button class="btn-rm-risk" onclick="removeRisk('${r.id}')">✕</button>`:''}</div>
       <div class="risk-sub">危険の内容</div>
@@ -815,83 +836,71 @@ function renderRisks(){
   });
 }
 
-// ===== SETTINGS: 作業種別 =====
+// ===== 設定：作業種別 =====
 function renderWorkTypeSettings(){
-  const list=document.getElementById('workTypeList');list.innerHTML='';
+  const list=document.getElementById('workTypeList'); list.innerHTML='';
   workTypes.forEach((t,i)=>{
-    const row=document.createElement('div');row.className='settings-item';
-    row.innerHTML=`
-      <span>${t}</span>
-      <div class="item-order">
-        <button class="btn-item-up" onclick="moveWorkType(${i},-1)" ${i===0?'disabled':''}>↑</button>
-        <button class="btn-item-down" onclick="moveWorkType(${i},1)" ${i===workTypes.length-1?'disabled':''}>↓</button>
-      </div>
-      <button class="btn-item-del" onclick="delWorkType(${i})">✕</button>`;
+    const row=document.createElement('div'); row.className='settings-item';
+    row.innerHTML=`<span>${t}</span><div class="item-order"><button class="btn-item-up" onclick="moveWorkType(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn-item-down" onclick="moveWorkType(${i},1)" ${i===workTypes.length-1?'disabled':''}>↓</button></div><button class="btn-item-del" onclick="delWorkType(${i})">✕</button>`;
     list.appendChild(row);
   });
 }
 function addWorkType(){
-  const input=document.getElementById('workTypeInput');const val=input.value.trim();
+  const input=document.getElementById('workTypeInput'); const val=input.value.trim();
   if(!val){showToast('⚠️ 作業種別を入力してください');return;}
   if(workTypes.includes(val)){showToast('すでに登録されています');return;}
-  workTypes.push(val);saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
-  input.value='';showToast('✅ 追加しました');
+  workTypes.push(val); saveMasters(); rebuildWorkTypeSelect(); renderWorkTypeSettings();
+  input.value=''; showToast('✅ 追加しました');
 }
 function moveWorkType(i,dir){
-  const j=i+dir;if(j<0||j>=workTypes.length)return;
+  const j=i+dir; if(j<0||j>=workTypes.length) return;
   [workTypes[i],workTypes[j]]=[workTypes[j],workTypes[i]];
-  saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+  saveMasters(); rebuildWorkTypeSelect(); renderWorkTypeSettings();
 }
 function delWorkType(i){
-  if(!confirm(`「${workTypes[i]}」を削除しますか？`))return;
-  workTypes.splice(i,1);saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+  if(!confirm(`「${workTypes[i]}」を削除しますか？`)) return;
+  workTypes.splice(i,1); saveMasters(); rebuildWorkTypeSelect(); renderWorkTypeSettings();
   showToast('🗑️ 削除しました');
 }
 function resetWorkTypes(){
-  if(!confirm('作業種別を初期値に戻しますか？'))return;
-  workTypes=DEFAULT_WORK_TYPES.slice();saveMasters();rebuildWorkTypeSelect();renderWorkTypeSettings();
+  if(!confirm('作業種別を初期値に戻しますか？')) return;
+  workTypes=DEFAULT_WORK_TYPES.slice(); saveMasters(); rebuildWorkTypeSelect(); renderWorkTypeSettings();
   showToast('🔄 初期値に戻しました');
 }
 
-// ===== SETTINGS: 使用機械 =====
+// ===== 設定：使用機械 =====
 function renderEquipSettings(){
-  const list=document.getElementById('equipList');list.innerHTML='';
+  const list=document.getElementById('equipList'); list.innerHTML='';
   equips.forEach((e,i)=>{
-    const row=document.createElement('div');row.className='settings-item';
-    row.innerHTML=`
-      <span>${e}</span>
-      <div class="item-order">
-        <button class="btn-item-up" onclick="moveEquip(${i},-1)" ${i===0?'disabled':''}>↑</button>
-        <button class="btn-item-down" onclick="moveEquip(${i},1)" ${i===equips.length-1?'disabled':''}>↓</button>
-      </div>
-      <button class="btn-item-del" onclick="delEquip(${i})">✕</button>`;
+    const row=document.createElement('div'); row.className='settings-item';
+    row.innerHTML=`<span>${e}</span><div class="item-order"><button class="btn-item-up" onclick="moveEquip(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn-item-down" onclick="moveEquip(${i},1)" ${i===equips.length-1?'disabled':''}>↓</button></div><button class="btn-item-del" onclick="delEquip(${i})">✕</button>`;
     list.appendChild(row);
   });
 }
 function addEquip(){
-  const input=document.getElementById('equipInput');const val=input.value.trim();
+  const input=document.getElementById('equipInput'); const val=input.value.trim();
   if(!val){showToast('⚠️ 機械・工具名を入力してください');return;}
   if(equips.includes(val)){showToast('すでに登録されています');return;}
-  equips.push(val);saveMasters();rebuildEquipSelect();renderEquipSettings();
-  input.value='';showToast('✅ 追加しました');
+  equips.push(val); saveMasters(); rebuildEquipSelect(); renderEquipSettings();
+  input.value=''; showToast('✅ 追加しました');
 }
 function moveEquip(i,dir){
-  const j=i+dir;if(j<0||j>=equips.length)return;
+  const j=i+dir; if(j<0||j>=equips.length) return;
   [equips[i],equips[j]]=[equips[j],equips[i]];
-  saveMasters();rebuildEquipSelect();renderEquipSettings();
+  saveMasters(); rebuildEquipSelect(); renderEquipSettings();
 }
 function delEquip(i){
-  if(!confirm(`「${equips[i]}」を削除しますか？`))return;
-  equips.splice(i,1);saveMasters();rebuildEquipSelect();renderEquipSettings();
+  if(!confirm(`「${equips[i]}」を削除しますか？`)) return;
+  equips.splice(i,1); saveMasters(); rebuildEquipSelect(); renderEquipSettings();
   showToast('🗑️ 削除しました');
 }
 function resetEquips(){
-  if(!confirm('使用機械・工具を初期値に戻しますか？'))return;
-  equips=DEFAULT_EQUIPS.slice();saveMasters();rebuildEquipSelect();renderEquipSettings();
+  if(!confirm('使用機械・工具を初期値に戻しますか？')) return;
+  equips=DEFAULT_EQUIPS.slice(); saveMasters(); rebuildEquipSelect(); renderEquipSettings();
   showToast('🔄 初期値に戻しました');
 }
 
-// ===== FORM SAVE/LOAD =====
+// ===== フォーム保存・読み込み（ローカル下書き） =====
 function save(){
   const data={
     workDate:document.getElementById('workDate').value,
@@ -903,31 +912,31 @@ function save(){
     equipment:document.getElementById('equipment').value,
     safetyGoal:document.getElementById('safetyGoal').value,
     notes:document.getElementById('notes').value,
-    members,risks,riskCount,ppe:Array.from(ppeSelected),
+    members, risks, riskCount, ppe:Array.from(ppeSelected),
   };
-  localStorage.setItem(KEY.form,JSON.stringify(data));
+  localStorage.setItem('ky_form', JSON.stringify(data));
 }
 function loadForm(){
-  let data;try{data=JSON.parse(localStorage.getItem(KEY.form));}catch(e){}
-  if(!data){document.getElementById('workDate').value=todayStr();return;}
+  let data; try{data=JSON.parse(localStorage.getItem('ky_form'));}catch(e){}
+  if(!data){ document.getElementById('workDate').value=todayStr(); return; }
   document.getElementById('workDate').value=data.workDate||todayStr();
   document.getElementById('weather').value=data.weather||'';
   document.getElementById('workDetail').value=data.workDetail||'';
   document.getElementById('safetyGoal').value=data.safetyGoal||'';
   document.getElementById('notes').value=data.notes||'';
-  if(data.siteVal&&data.siteVal!=='__other__'){const s=document.getElementById('siteName');if([...s.options].some(o=>o.value===data.siteVal))s.value=data.siteVal;}
-  if(data.leaderVal){const s=document.getElementById('leaderSel');if([...s.options].some(o=>o.value===data.leaderVal))s.value=data.leaderVal;}
-  if(data.workType){const s=document.getElementById('workType');if([...s.options].some(o=>o.value===data.workType))s.value=data.workType;}
-  if(data.equipment){const s=document.getElementById('equipment');if([...s.options].some(o=>o.value===data.equipment))s.value=data.equipment;}
-  members=data.members||[];renderWorkerChecks();renderTags();
-  risks=data.risks||[];riskCount=data.riskCount||0;renderRisks();
+  if(data.siteVal&&data.siteVal!=='__other__'){ const s=document.getElementById('siteName'); if([...s.options].some(o=>o.value===data.siteVal)) s.value=data.siteVal; }
+  if(data.leaderVal){ const s=document.getElementById('leaderSel'); if([...s.options].some(o=>o.value===data.leaderVal)) s.value=data.leaderVal; }
+  if(data.workType){ const s=document.getElementById('workType'); if([...s.options].some(o=>o.value===data.workType)) s.value=data.workType; }
+  if(data.equipment){ const s=document.getElementById('equipment'); if([...s.options].some(o=>o.value===data.equipment)) s.value=data.equipment; }
+  members=data.members||[]; renderWorkerChecks(); renderTags();
+  risks=data.risks||[]; riskCount=data.riskCount||0; renderRisks();
   ppeSelected=new Set(data.ppe||[]);
-  document.querySelectorAll('.ppe-btn').forEach(b=>{if(ppeSelected.has(b.dataset.item))b.classList.add('on');});
+  document.querySelectorAll('.ppe-btn').forEach(b=>{ if(ppeSelected.has(b.dataset.item)) b.classList.add('on'); });
   updateProgress();
 }
-function todayStr(){return new Date().toISOString().split('T')[0];}
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
 
-// ===== PROGRESS =====
+// ===== 進捗バー =====
 function updateProgress(){
   const sv=document.getElementById('siteName').value;
   const lv=document.getElementById('leaderSel').value;
@@ -939,16 +948,17 @@ function updateProgress(){
   ];
   let filled=0;
   checks.forEach((fn,i)=>{
-    const ok=!!fn();const el=document.getElementById('num'+(i+1));
-    if(ok){filled++;el.classList.add('done');el.textContent='✓';}
-    else{el.classList.remove('done');el.textContent=i+1;}
+    const ok=!!fn(); const el=document.getElementById('num'+(i+1));
+    if(ok){ filled++; el.classList.add('done'); el.textContent='✓'; }
+    else{ el.classList.remove('done'); el.textContent=i+1; }
   });
   document.getElementById('progressFill').style.width=(filled/4*100)+'%';
   document.getElementById('progressLabel').textContent=`${filled} / 4 セクション入力済み`;
 }
 
-// ===== SUBMIT =====
-function submitForm(){
+// ===== 送信（Firestore保存） =====
+async function submitForm(){
+  if(!_fbReady){ showToast('⚠️ Firebase設定が完了していません。設定ページを確認してください。'); return; }
   const sv=document.getElementById('siteName').value;
   const lv=document.getElementById('leaderSel').value;
   if(!document.getElementById('workDate').value){showToast('⚠️ 作業日を入力してください');return;}
@@ -957,13 +967,15 @@ function submitForm(){
   if(!document.getElementById('workType').value){showToast('⚠️ 作業種別を選択してください');return;}
   if(!document.getElementById('workDetail').value){showToast('⚠️ 作業詳細を入力してください');return;}
 
-  // 編集中のIDがあれば引き継ぐ、新規ならDate.nowで生成
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='⏳ 保存中…';
+
   const recordId=_editingId||('rec_'+Date.now());
   const record={
-    id:recordId,savedAt:new Date().toISOString(),
+    id:recordId, savedAt:new Date().toISOString(),
     workDate:document.getElementById('workDate').value,
-    site:sv,weather:document.getElementById('weather').value,
-    leader:lv,members:[...members],
+    site:sv, weather:document.getElementById('weather').value,
+    leader:lv, members:[...members],
     workType:document.getElementById('workType').value,
     workDetail:document.getElementById('workDetail').value,
     equipment:document.getElementById('equipment').value,
@@ -971,30 +983,25 @@ function submitForm(){
     risks:JSON.parse(JSON.stringify(risks)),
     safetyGoal:document.getElementById('safetyGoal').value,
     notes:document.getElementById('notes').value,
-    sent:false,
   };
-  const recs=getRecords();
-  // 編集中IDで検索、なければ同日同現場で検索
-  let sameIdx=recs.findIndex(r=>r.id===recordId);
-  if(sameIdx<0) sameIdx=recs.findIndex(r=>r.workDate===record.workDate&&r.site===record.site&&r.id!==recordId);
-  if(sameIdx>=0){
-    if(_editingId){
-      recs[sameIdx]=record; // 編集中なら確認なしで上書き
-    } else {
-      if(!confirm('同じ日・現場の記録があります。上書きしますか？'))return;
-      recs[sameIdx]=record;
-    }
-  } else recs.unshift(record);
-  _editingId=recordId; // 保存後は同じIDを継続して使う
-  saveRecords(recs);
-  buildPreview();
-  document.getElementById('preview-panel').style.display='block';
-  showToast('✅ KY記録を保存しました！');
-  document.getElementById('preview-panel').scrollIntoView({behavior:'smooth'});
-  setTimeout(()=>{if(confirm('KY記録票を印刷・保存しますか？'))window.print();},400);
+
+  try{
+    await db.collection('kyRecords').doc(recordId).set(record);
+    _editingId=recordId;
+    buildPreview();
+    document.getElementById('preview-panel').style.display='block';
+    showToast('✅ KY記録を保存しました！');
+    document.getElementById('preview-panel').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>{ if(confirm('KY記録票を印刷・保存しますか？')) window.print(); }, 400);
+  } catch(e){
+    showToast('⚠️ 保存に失敗しました。通信状態を確認してください。');
+    console.error(e);
+  } finally{
+    btn.disabled=false; btn.textContent='✅ KY記録を完成・保存';
+  }
 }
 
-// ===== PREVIEW =====
+// ===== プレビュー =====
 function buildPreview(){
   const date=document.getElementById('workDate').value;
   const sv=document.getElementById('siteName').value;
@@ -1023,121 +1030,70 @@ function buildPreview(){
     <div style="text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid #eee"><p style="font-size:11px;color:#999">作成：${new Date().toLocaleString('ja-JP')}</p></div>`;
 }
 
-// ===== RECORDS =====
-function getRecords(){try{return JSON.parse(localStorage.getItem(KEY.records))||[];}catch(e){return[];}}
-function saveRecords(recs){localStorage.setItem(KEY.records,JSON.stringify(recs));}
-
-// ===== GASから記録一覧を取得（全員共有） =====
-let _gasRecordsCache=null; // キャッシュ
-
-function fetchGasRecords(callback){
-  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
-  if(!gasUrl){ callback(null); return; }
-
-  const url=gasUrl+'?action=getRecords';
-  fetch(url)
-    .then(res=>res.json())
-    .then(json=>{
-      if(json.status==='ok'){
-        _gasRecordsCache=json.records||[];
-        callback(_gasRecordsCache);
-      } else {
-        callback(null);
-      }
-    })
-    .catch(()=>{ callback(null); });
+// ===== 記録一覧（Firestore） =====
+async function renderList(){
+  const container=document.getElementById('recordList');
+  container.innerHTML='<div style="text-align:center;padding:40px;color:#888;font-size:13px;">⏳ 記録を読み込み中…</div>';
+  if(!_fbReady){
+    container.innerHTML='<div style="text-align:center;padding:40px;color:#888;font-size:13px;">⚠️ Firebase設定が必要です</div>';
+    return;
+  }
+  try{
+    const snapshot=await db.collection('kyRecords').get();
+    _recordsCache=snapshot.docs.map(doc=>doc.data());
+    applyFilter();
+  } catch(e){
+    container.innerHTML='<div style="text-align:center;padding:40px;color:#888;font-size:13px;">⚠️ 読み込みに失敗しました。通信を確認してください。</div>';
+  }
 }
 
-function updateSummary(){
-  // まずlocalStorageで即時表示、その後GASから更新
-  const localRecs=getRecords();
-  const now=new Date();
-  const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  document.getElementById('sum-total').textContent=localRecs.length;
-  document.getElementById('sum-month').textContent=localRecs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
-  document.getElementById('sum-high').textContent=localRecs.reduce((s,r)=>s+(r.risks||[]).filter(x=>x.level==='high').length,0);
-  const unsentN=localRecs.filter(r=>!r.sent).length;
-  document.getElementById('sum-unsent').textContent=unsentN;
-  updateUnsentBadge();
-
-  // GASからも取得して合計数を更新
-  fetchGasRecords(recs=>{
-    if(!recs) return;
-    document.getElementById('sum-total').textContent=recs.length;
-    document.getElementById('sum-month').textContent=recs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
-    document.getElementById('sum-high').textContent=recs.reduce((s,r)=>{
-      // GASの記録はrisksが文字列になっているので高リスク件数は別途カウント
-      const risksStr=String(r.risks||'');
-      return s+(risksStr.match(/レベル：高/g)||[]).length;
-    },0);
-  });
-}
-
-function renderList(){
-  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
+function applyFilter(){
   const container=document.getElementById('recordList');
   const fm=document.getElementById('filterMonth').value;
   const fs=document.getElementById('filterSite').value;
-
-  // 毎回コンテナをクリア（これが重複防止の要）
   container.innerHTML='';
+  _renderRecordCards(_recordsCache, fm, fs, container);
+}
 
-  // まずlocalStorageの記録を即時表示
-  const localRecs=getRecords();
-  _renderRecordCards(localRecs,fm,fs,container);
-  updateSummary();
-
-  // GAS URLが設定されていれば全員の記録を取得して上書き
-  if(gasUrl){
-    const loadingEl=document.createElement('div');
-    loadingEl.id='gasLoadingMsg';
-    loadingEl.style.cssText='text-align:center;padding:10px;font-size:12px;color:#888;font-weight:700;';
-    loadingEl.textContent='☁️ スプレッドシートから全員の記録を読み込み中…';
-    container.insertAdjacentElement('afterbegin',loadingEl);
-
-    fetchGasRecords(recs=>{
-      // ローディング表示を消す
-      const msg=document.getElementById('gasLoadingMsg');
-      if(msg)msg.remove();
-      if(recs && recs.length>0){
-        // GASから取得できたら全件表示（localを上書き）
-        container.innerHTML='';
-        _renderRecordCards(recs,fm,fs,container);
-        updateSummary();
-      }
-      // recs===null（取得失敗）ならlocalのまま表示継続
-    });
-  }
+async function updateSummary(){
+  if(!_fbReady) return;
+  try{
+    const snapshot=await db.collection('kyRecords').get();
+    const recs=snapshot.docs.map(doc=>doc.data());
+    const now=new Date();
+    const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    document.getElementById('sum-total').textContent=recs.length;
+    document.getElementById('sum-month').textContent=recs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
+    document.getElementById('sum-high').textContent=recs.reduce((s,r)=>s+(r.risks||[]).filter(x=>x.level==='high').length, 0);
+  } catch(e){}
 }
 
 function _renderRecordCards(recs,fm,fs,container){
   let filtered=recs;
-  if(fm)filtered=filtered.filter(r=>r.workDate&&r.workDate.startsWith(fm));
-  if(fs)filtered=filtered.filter(r=>r.site===fs);
+  if(fm) filtered=filtered.filter(r=>r.workDate&&r.workDate.startsWith(fm));
+  if(fs) filtered=filtered.filter(r=>r.site===fs);
   filtered.sort((a,b)=>(b.workDate||'').localeCompare(a.workDate||''));
-
   if(filtered.length===0){
-    container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を完成・保存すると<br>ここに表示されます。</p></div>`;
+    container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を保存すると<br>ここに表示されます。</p></div>`;
     return;
   }
   filtered.forEach(rec=>{
     const d=new Date(rec.workDate+'T00:00:00');
-    const month=`${d.getMonth()+1}月`;const day=d.getDate();
+    const month=`${d.getMonth()+1}月`; const day=d.getDate();
     const dow=['日','月','火','水','木','金','土'][d.getDay()];
     const highR=(rec.risks||[]).filter(r=>r.level==='high').length;
     const midR=(rec.risks||[]).filter(r=>r.level==='mid').length;
     let badgeHTML='';
-    if(rec.workType)badgeHTML+=`<span class="record-badge">${rec.workType}</span>`;
-    if(highR>0)badgeHTML+=`<span class="record-badge has-high">🔴 高リスク×${highR}</span>`;
-    else if(midR>0)badgeHTML+=`<span class="record-badge has-mid">🟠 中リスク×${midR}</span>`;
+    if(rec.workType) badgeHTML+=`<span class="record-badge">${rec.workType}</span>`;
+    if(highR>0) badgeHTML+=`<span class="record-badge has-high">🔴 高リスク×${highR}</span>`;
+    else if(midR>0) badgeHTML+=`<span class="record-badge has-mid">🟠 中リスク×${midR}</span>`;
     const memStr=rec.leader+(rec.members&&rec.members.length?` 他${rec.members.length}名`:'');
-    const sentBadge=rec.sent?'<span class="sent-badge sent">☁️送信済</span>':'<span class="sent-badge unsent">未送信</span>';
-    const card=document.createElement('div');card.className='record-card'+(rec.sent?'':' unsent-card');card.id='reccard_'+rec.id;
+    const card=document.createElement('div'); card.className='record-card'; card.id='reccard_'+rec.id;
     card.innerHTML=`
       <div class="record-card-header" onclick="toggleRecDetail('${rec.id}')">
         <div class="record-date-badge"><div class="r-month">${month}</div><div class="r-day">${day}</div><div class="r-dow">(${dow})</div></div>
         <div class="record-info">
-          <div class="record-site">${rec.site||'（現場未設定）'}${sentBadge}</div>
+          <div class="record-site">${rec.site||'（現場未設定）'}</div>
           <div class="record-meta">👷 ${memStr}　${rec.weather||''}</div>
           <div class="record-badges">${badgeHTML}</div>
         </div>
@@ -1147,7 +1103,7 @@ function _renderRecordCards(recs,fm,fs,container){
         <div class="record-detail-inner">${buildRecordDetailHTML(rec)}</div>
         <div class="record-actions">
           <button class="btn-rec-print" onclick="printRecord('${rec.id}')">🖨️ 印刷</button>
-          <button class="btn-rec-edit"  onclick="editRecord('${rec.id}')">✏️ 編集</button>
+          <button class="btn-rec-edit" onclick="editRecord('${rec.id}')">✏️ 編集</button>
           <button class="btn-rec-delete" onclick="deleteRecord('${rec.id}')">🗑️</button>
         </div>
       </div>`;
@@ -1155,18 +1111,11 @@ function _renderRecordCards(recs,fm,fs,container){
   });
 }
 
-
 function buildRecordDetailHTML(rec){
-  // GASからのデータはrisksが文字列の場合があるので安全に処理
-  let risksArr=rec.risks||[];
-  if(typeof risksArr==='string'){
-    // 文字列の場合はシンプルに表示
-    risksArr=[{danger:risksArr,countermeasure:'',level:''}];
-  }
   const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'－';
-  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):(typeof rec.members==='string'?rec.members:'（なし）');
-  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):(typeof rec.ppe==='string'?rec.ppe:'－');
-  const risksHTML=risksArr.map((r,i)=>{
+  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'（なし）';
+  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):'－';
+  const risksHTML=(rec.risks||[]).map((r,i)=>{
     const badge=r.level==='low'?'<span class="rb low">低</span>':r.level==='mid'?'<span class="rb mid">中</span>':r.level==='high'?'<span class="rb high">高</span>':'';
     return`<div class="detail-risk-block"><div class="detail-risk-label">⚠️ 危険ポイント ${i+1} ${badge}</div><div class="detail-risk-danger">${r.danger||'（未入力）'}</div><div class="detail-risk-measure">🛡️ 対策：${r.countermeasure||'－'}</div></div>`;
   }).join('')||'<p style="font-size:13px;color:#999">なし</p>';
@@ -1192,57 +1141,53 @@ function toggleRecDetail(id){
   detail.classList.toggle('open');
   chev.textContent=detail.classList.contains('open')?'▼':'▶';
 }
+
 function printRecord(id){
-  const rec=getRecords().find(r=>r.id===id);if(!rec)return;
+  const rec=_recordsCache.find(r=>r.id===id); if(!rec) return;
   const panel=document.getElementById('preview-panel');
   panel.innerHTML=buildPrintPreview(rec);
   panel.style.display='block';
   showPage('form');
-  setTimeout(()=>window.print(),300);
+  setTimeout(()=>window.print(), 300);
 }
+
 function editRecord(id){
-  const rec=getRecords().find(r=>r.id===id);if(!rec)return;
+  const rec=_recordsCache.find(r=>r.id===id); if(!rec) return;
   document.getElementById('workDate').value=rec.workDate||'';
   document.getElementById('weather').value=rec.weather||'';
   document.getElementById('workDetail').value=rec.workDetail||'';
   document.getElementById('safetyGoal').value=rec.safetyGoal||'';
   document.getElementById('notes').value=rec.notes||'';
-  const ss=document.getElementById('siteName');if([...ss.options].some(o=>o.value===rec.site))ss.value=rec.site;
-  const ls=document.getElementById('leaderSel');if([...ls.options].some(o=>o.value===rec.leader))ls.value=rec.leader;
-  const wt=document.getElementById('workType');if([...wt.options].some(o=>o.value===rec.workType))wt.value=rec.workType;
-  const eq=document.getElementById('equipment');if([...eq.options].some(o=>o.value===rec.equipment))eq.value=rec.equipment;
-  members=[...rec.members||[]];renderWorkerChecks();renderTags();
-  risks=JSON.parse(JSON.stringify(rec.risks||[]));riskCount=risks.length;renderRisks();
+  const ss=document.getElementById('siteName'); if([...ss.options].some(o=>o.value===rec.site)) ss.value=rec.site;
+  const ls=document.getElementById('leaderSel'); if([...ls.options].some(o=>o.value===rec.leader)) ls.value=rec.leader;
+  const wt=document.getElementById('workType'); if([...wt.options].some(o=>o.value===rec.workType)) wt.value=rec.workType;
+  const eq=document.getElementById('equipment'); if([...eq.options].some(o=>o.value===rec.equipment)) eq.value=rec.equipment;
+  members=[...rec.members||[]]; renderWorkerChecks(); renderTags();
+  risks=JSON.parse(JSON.stringify(rec.risks||[])); riskCount=risks.length; renderRisks();
   ppeSelected=new Set(rec.ppe||[]);
-  document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.toggle('on',ppeSelected.has(b.dataset.item)));
-  _editingId=rec.id; // 編集中のIDをセット
-  save();showPage('form');updateProgress();showToast('✏️ 編集モードで読み込みました');
-}
-function deleteRecord(id){
-  if(!confirm('この記録を削除しますか？\n（スプレッドシート上の記録も削除されます）'))return;
-  // localStorageから削除
-  saveRecords(getRecords().filter(r=>r.id!==id));
-  // GASからも削除
-  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
-  if(gasUrl){
-    fetch(gasUrl,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'deleteRecord',id:id})
-    }).catch(()=>{});
-  }
-  _gasRecordsCache=null;
-  renderList();showToast('🗑️ 記録を削除しました');
+  document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.toggle('on', ppeSelected.has(b.dataset.item)));
+  _editingId=rec.id;
+  save(); showPage('form'); updateProgress(); showToast('✏️ 編集モードで読み込みました');
 }
 
-// ===== RESET =====
+async function deleteRecord(id){
+  if(!confirm('この記録を削除しますか？')) return;
+  try{
+    await db.collection('kyRecords').doc(id).delete();
+    _recordsCache=_recordsCache.filter(r=>r.id!==id);
+    applyFilter(); updateSummary();
+    showToast('🗑️ 記録を削除しました');
+  } catch(e){ showToast('⚠️ 削除に失敗しました'); }
+}
+
+// ===== リセット =====
 function resetToday(){
-  if(!confirm('今日の入力内容をリセットしますか？\n（現場・作業員・設定リストは残ります）'))return;
-  localStorage.removeItem(KEY.form);
-  members=[];risks=[];riskCount=0;ppeSelected.clear();
+  if(!confirm('今日の入力内容をリセットしますか？')) return;
+  localStorage.removeItem('ky_form');
+  members=[]; risks=[]; riskCount=0; ppeSelected.clear();
   document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.remove('on'));
   ['workDate','weather','leaderSel','workType','workDetail','safetyGoal','notes'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value='';
+    const el=document.getElementById(id); if(el) el.value='';
   });
   document.getElementById('siteName').value='';
   document.getElementById('equipment').value='';
@@ -1251,193 +1196,42 @@ function resetToday(){
   document.getElementById('workerAddRow').style.display='none';
   document.getElementById('workDate').value=todayStr();
   document.getElementById('preview-panel').style.display='none';
-  _editingId=null; // 新規モードに戻す
-  renderTags();addRisk();updateProgress();
+  _editingId=null;
+  renderTags(); addRisk(); updateProgress();
   showToast('🔄 今日の入力をリセットしました');
 }
-function clearAllData(){
-  if(!confirm('すべてのデータ（記録・現場・作業員・設定）を消去しますか？\nこの操作は元に戻せません。'))return;
+
+function clearLocalData(){
+  if(!confirm('このスマホの入力中データをクリアしますか？\n（Firebaseに保存済みの記録は消えません）')) return;
   localStorage.clear();
-  loadAll();resetToday();
-  showToast('🗑️ すべてのデータを消去しました');
+  _loadLocal();
+  resetToday();
+  showToast('🗑️ ローカルデータを消去しました');
 }
 
-// ===== MASTER SYNC FROM SHEETS =====
-function syncMaster(){
-  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
-  if(!gasUrl){
-    showToast('⚠️ 先にGAS URLを登録してください');
-    return;
-  }
-  const statusEl=document.getElementById('syncStatus');
-  if(!statusEl){ showToast('⚠️ 画面エラー。再読み込みしてください'); return; }
-  statusEl.style.display='block';
-  statusEl.style.color='var(--sub)';
-  statusEl.textContent='⏳ 読み込み中…';
-
-  // 新しいタブでGASを開いてJSONを取得し、手動でコピーしてもらう方式
-  const url=gasUrl+'?action=getMaster';
-  const win=window.open(url,'_blank');
-
-  // 案内メッセージを表示
-  statusEl.style.color='#1565C0';
-  statusEl.innerHTML='📋 開いたタブに表示された内容をすべてコピーして<br>下の入力欄に貼り付けてください。';
-
-  // 貼り付け欄を表示
-  const pasteArea=document.getElementById('masterPasteArea');
-  if(pasteArea) pasteArea.style.display='block';
-}
-
-function applyMasterData(){
-  const input=document.getElementById('masterPasteInput');
-  const statusEl=document.getElementById('syncStatus');
-  const text=(input?input.value:'').trim();
-  if(!text){ showToast('⚠️ データを貼り付けてください'); return; }
-  try{
-    const json=JSON.parse(text);
-    if(json.status!=='ok'){ throw new Error(json.msg||'ステータスエラー'); }
-    if(json.sites&&json.sites.length>0){
-      sites=json.sites;
-      localStorage.setItem(KEY.sites,JSON.stringify(sites));
-      rebuildSiteSelect();
-    }
-    if(json.workers&&json.workers.length>0){
-      workers=json.workers;
-      localStorage.setItem(KEY.workers,JSON.stringify(workers));
-      rebuildLeaderSelect();
-      rebuildWorkerSelect();
-    }
-    const sc=json.sites?json.sites.length:0;
-    const wc=json.workers?json.workers.length:0;
-    if(statusEl){
-      statusEl.style.display='block';
-      statusEl.style.color='var(--green)';
-      statusEl.textContent='✅ 同期完了！現場'+sc+'件・作業員'+wc+'名';
-    }
-    document.getElementById('masterPasteArea').style.display='none';
-    if(input)input.value='';
-    showToast('✅ マスターデータを反映しました！');
-  }catch(e){
-    showToast('❌ データの形式が正しくありません');
-    if(statusEl){
-      statusEl.style.display='block';
-      statusEl.style.color='var(--red)';
-      statusEl.textContent='❌ 貼り付けた内容が正しくありません：'+e.message;
-    }
-  }
-}
-// ===== GAS / SHEETS =====
-function saveGasUrl(){
-  const url=document.getElementById('gasUrlInput').value.trim();
-  localStorage.setItem(KEY.gasUrl,url);
-  updateGasStatus(url);
-}
-function updateGasStatus(url){
-  const el=document.getElementById('gasStatus');
-  if(el)el.style.display=url?'block':'none';
-}
-async function sendToSheets(){
-  const gasUrl=localStorage.getItem(KEY.gasUrl)||'';
-  if(!gasUrl){
-    showToast('⚠️ 先に設定タブでGAS URLを登録してください');
-    setTimeout(()=>showPage('settings'),1200);
-    return;
-  }
-  const sv=document.getElementById('siteName').value;
-  const lv=document.getElementById('leaderSel').value;
-  if(!document.getElementById('workDate').value){showToast('⚠️ 作業日を入力してください');return;}
-  if(!sv||sv==='__other__'){showToast('⚠️ 現場名を選択してください');return;}
-  if(!lv||lv==='__new__'){showToast('⚠️ 責任者を選択してください');return;}
-
-  const payload={
-    workDate:document.getElementById('workDate').value,
-    site:sv,
-    weather:document.getElementById('weather').value,
-    leader:lv,
-    members:members.join('、'),
-    workType:document.getElementById('workType').value,
-    workDetail:document.getElementById('workDetail').value,
-    equipment:document.getElementById('equipment').value,
-    ppe:Array.from(ppeSelected).join('、'),
-    risks:risks.map((r,i)=>`【危険${i+1}】${r.danger} 対策：${r.countermeasure} レベル：${r.level==='high'?'高':r.level==='mid'?'中':'低'}`).join(' / '),
-    safetyGoal:document.getElementById('safetyGoal').value,
-    notes:document.getElementById('notes').value,
-    savedAt:new Date().toLocaleString('ja-JP'),
-  };
-
-  const btn=document.querySelector('.btn-sheets');
-  if(btn){btn.disabled=true;btn.textContent='⏳ 送信中…';}
-
-  // GETパラメータで送信（スマホCORS回避・最もシンプルで確実な方法）
-  try{
-    const params=new URLSearchParams(payload).toString();
-    const sendUrl=gasUrl+'?'+params;
-    const res=await fetch(sendUrl);
-    const text=await res.text();
-    let json={status:'ok'};
-    try{ json=JSON.parse(text); }catch(e){}
-    if(json.status==='ok'){
-      markSent();
-      showToast('☁️ Googleスプレッドシートに送信しました！');
-    } else {
-      showToast('❌ 送信エラー：'+(json.msg||'不明'));
-    }
-  }catch(err){
-    showToast('❌ 送信に失敗しました（通信エラー）');
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent='☁️ Googleスプレッドシートに送信';}
-  }
-
-  function markSent(){
-    const allRecs=getRecords();
-    const wd=payload.workDate;
-    const sentIdx=allRecs.findIndex(r=>r.workDate===wd&&r.site===payload.site);
-    if(sentIdx>=0){allRecs[sentIdx].sent=true;saveRecords(allRecs);}
-    _gasRecordsCache=null;
-  }
-}
-
-
-// ===== ⑤ 未送信カウント =====
-function getUnsentCount(){
-  return getRecords().filter(r=>!r.sent).length;
-}
-function updateUnsentBadge(){
-  const n=getUnsentCount();
-  let badge=document.getElementById('unsentBadge');
-  if(!badge){
-    badge=document.createElement('span');
-    badge.id='unsentBadge';
-    badge.style.cssText='background:var(--orange);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:4px;';
-    const listBtn=document.getElementById('tab-list-btn');
-    if(listBtn)listBtn.appendChild(badge);
-  }
-  badge.textContent=n>0?`未送信${n}`:'';
-  badge.style.display=n>0?'inline':'none';
-}
-
-// ===== ⑦ テンプレート（過去の危険ポイント引用） =====
-function openTplSheet(){
-  const recs=getRecords();
-  const allRisks=[];
-  recs.forEach(rec=>{
-    (rec.risks||[]).forEach(r=>{
-      if(r.danger&&r.danger.trim()){
-        allRisks.push({date:rec.workDate,site:rec.site,danger:r.danger,countermeasure:r.countermeasure,level:r.level});
-      }
-    });
-  });
+// ===== テンプレート（過去の危険ポイント引用） =====
+async function openTplSheet(){
   const list=document.getElementById('tplList');
-  if(allRisks.length===0){
-    list.innerHTML='<div class="tpl-empty">過去の危険ポイントがまだありません。<br>記録を保存すると引用できるようになります。</div>';
-  }else{
-    // 重複を省いて最新20件
+  list.innerHTML='<div class="tpl-empty">⏳ 読み込み中…</div>';
+  document.getElementById('tplOverlay').classList.add('open');
+  if(!_fbReady){ list.innerHTML='<div class="tpl-empty">Firebase設定後に使用できます</div>'; return; }
+  try{
+    const snapshot=await db.collection('kyRecords').get();
+    const recs=snapshot.docs.map(doc=>doc.data());
+    const allRisks=[];
+    recs.sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||'')).forEach(rec=>{
+      (rec.risks||[]).forEach(r=>{
+        if(r.danger&&r.danger.trim()){
+          allRisks.push({date:rec.workDate,site:rec.site,danger:r.danger,countermeasure:r.countermeasure,level:r.level});
+        }
+      });
+    });
+    if(allRisks.length===0){
+      list.innerHTML='<div class="tpl-empty">過去の危険ポイントがまだありません。<br>記録を保存すると引用できるようになります。</div>';
+      return;
+    }
     const seen=new Set();
-    const unique=allRisks.filter(r=>{
-      const k=r.danger.trim();
-      if(seen.has(k))return false;
-      seen.add(k);return true;
-    }).slice(0,20);
+    const unique=allRisks.filter(r=>{ const k=r.danger.trim(); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,20);
     list.innerHTML=unique.map((r,i)=>{
       const levelStr=r.level==='high'?'🔴 高':r.level==='mid'?'🟠 中':r.level==='low'?'🟢 低':'';
       return`<div class="tpl-item" onclick="applyTemplate(${i})">
@@ -1447,8 +1241,9 @@ function openTplSheet(){
       </div>`;
     }).join('');
     list._data=unique;
+  } catch(e){
+    list.innerHTML='<div class="tpl-empty">読み込みに失敗しました</div>';
   }
-  document.getElementById('tplOverlay').classList.add('open');
 }
 function closeTplSheet(e){
   if(!e||e.target===document.getElementById('tplOverlay'))
@@ -1456,22 +1251,17 @@ function closeTplSheet(e){
 }
 function applyTemplate(i){
   const list=document.getElementById('tplList');
-  const item=list._data&&list._data[i];
-  if(!item)return;
-  // 新しいリスク行を追加して内容を設定
+  const item=list._data&&list._data[i]; if(!item) return;
   riskCount++;
-  const newRisk={id:'r'+riskCount,danger:item.danger,countermeasure:item.countermeasure||'',level:item.level||''};
-  risks.push(newRisk);
-  renderRisks();
-  save();
+  risks.push({id:'r'+riskCount,danger:item.danger,countermeasure:item.countermeasure||'',level:item.level||''});
+  renderRisks(); save();
   document.getElementById('tplOverlay').classList.remove('open');
   showToast('✅ 危険ポイントを引用しました');
-  // セクション4を開く
   const body4=document.getElementById('body4');
-  if(!body4.classList.contains('open')){toggleCard(4);}
+  if(!body4.classList.contains('open')) toggleCard(4);
 }
 
-// ===== ⑥ A4印刷 =====
+// ===== A4印刷 =====
 function buildPrintPreview(rec){
   const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'';
   const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'－';
@@ -1508,7 +1298,7 @@ function buildPrintPreview(rec){
         <tr><th>保護具</th><td colspan="3">${ppe}</td></tr>
       </table>
     </div>
-    <div class="print-section"><div class="print-section-title">危険ポイント・対策</div>${risksHTML}</div>
+    <div class="print-section"><div class="print-section-title">危険ポイント・対策</div>${risksHTML||'<p style="font-size:12px;color:#999">なし</p>'}</div>
     <div class="print-section"><div class="print-section-title">安全目標・連絡</div>
       <table class="print-table">
         <tr><th>安全目標</th><td>${rec.safetyGoal||'－'}</td></tr>
@@ -1523,25 +1313,10 @@ function buildPrintPreview(rec){
   </div>`;
 }
 
-// ===== ② 月次バックアップリマインダー =====
-function checkBackupReminder(){
-  const lastCheck=localStorage.getItem('ky_lastBackup')||'';
-  const now=new Date();
-  const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  if(lastCheck===ym)return;
-  const unsentCount=getUnsentCount();
-  if(unsentCount>0){
-    setTimeout(()=>{
-      showToast(`⚠️ 未送信の記録が${unsentCount}件あります`);
-    },2000);
-  }
-  localStorage.setItem('ky_lastBackup',ym);
-}
-
-// ===== TOAST =====
+// ===== トースト =====
 function showToast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
 }
 </script>
 </body>

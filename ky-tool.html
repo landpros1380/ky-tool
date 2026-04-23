@@ -443,6 +443,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
     </div>
   </div>
 
+  <!-- 現場名 -->
+  <div class="settings-section">
+    <div class="settings-section-header">
+      <span class="s-icon">🏢</span>
+      <h2>現場名の編集</h2>
+    </div>
+    <div class="settings-section-body">
+      <div class="settings-item-list" id="siteList"></div>
+      <div class="settings-add-row">
+        <input type="text" id="siteSettingInput" placeholder="新しい現場名を入力" onkeydown="if(event.key==='Enter')addSiteSetting()">
+        <button class="btn-settings-add" onclick="addSiteSetting()">+</button>
+      </div>
+      <p class="settings-hint">↑↓ボタンで順番を変更、✕ボタンで削除できます</p>
+    </div>
+  </div>
+
   <!-- 作業種別 -->
   <div class="settings-section">
     <div class="settings-section-header">
@@ -646,7 +662,7 @@ function showPage(p){
     document.getElementById('tab-'+t+'-btn').classList.toggle('active-tab', t===p);
   });
   if(p==='list'){ renderList(); updateSummary(); }
-  if(p==='settings'){ renderWorkTypeSettings(); renderEquipSettings(); updateFbStatus(); }
+  if(p==='settings'){ renderSiteSettings(); renderWorkTypeSettings(); renderEquipSettings(); updateFbStatus(); }
 }
 
 // ===== カード開閉 =====
@@ -680,7 +696,7 @@ async function loadAll(){
   }
   rebuildSiteSelect(); rebuildLeaderSelect(); rebuildWorkerSelect();
   rebuildWorkTypeSelect(); rebuildEquipSelect();
-  renderWorkTypeSettings(); renderEquipSettings();
+  renderSiteSettings(); renderWorkTypeSettings(); renderEquipSettings();
 }
 
 function _loadLocal(){
@@ -892,6 +908,33 @@ function renderRisks(){
     list.appendChild(div);
     _renderScoreBadge(r);
   });
+}
+
+// ===== 設定：現場名 =====
+function renderSiteSettings(){
+  const list=document.getElementById('siteList'); if(!list) return; list.innerHTML='';
+  sites.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='settings-item';
+    row.innerHTML=`<span>${s}</span><div class="item-order"><button class="btn-item-up" onclick="moveSite(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn-item-down" onclick="moveSite(${i},1)" ${i===sites.length-1?'disabled':''}>↓</button></div><button class="btn-item-del" onclick="delSite(${i})">✕</button>`;
+    list.appendChild(row);
+  });
+}
+function addSiteSetting(){
+  const input=document.getElementById('siteSettingInput'); const val=input.value.trim();
+  if(!val){showToast('⚠️ 現場名を入力してください');return;}
+  if(sites.includes(val)){showToast('すでに登録されています');return;}
+  sites.push(val); saveMasters(); rebuildSiteSelect(); renderSiteSettings();
+  input.value=''; showToast('✅ 追加しました');
+}
+function moveSite(i,dir){
+  const j=i+dir; if(j<0||j>=sites.length) return;
+  [sites[i],sites[j]]=[sites[j],sites[i]];
+  saveMasters(); rebuildSiteSelect(); renderSiteSettings();
+}
+function delSite(i){
+  if(!confirm(`「${sites[i]}」を削除しますか？`)) return;
+  sites.splice(i,1); saveMasters(); rebuildSiteSelect(); renderSiteSettings();
+  showToast('🗑️ 削除しました');
 }
 
 // ===== 設定：作業種別 =====

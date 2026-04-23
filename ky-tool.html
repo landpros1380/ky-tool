@@ -89,6 +89,17 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .rl-btn.high.active{background:var(--red);color:#fff;border-color:var(--red);}
 .btn-add-risk{width:100%;background:transparent;border:2px dashed var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:4px;}
 .btn-add-risk:active{background:#f5f5f5;}
+.risk-score{margin-top:8px;min-height:28px;}
+/* HEALTH CHECK */
+.health-check-area{margin-top:10px;background:var(--bg);border-radius:10px;padding:10px 12px;}
+.health-check-area h4{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.08em;margin-bottom:8px;text-transform:uppercase;}
+.health-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.health-row:last-child{margin-bottom:0;}
+.health-name{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.health-btn{padding:5px 8px;border-radius:16px;border:2px solid var(--border);background:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap;}
+.health-btn.good.active{background:var(--green);color:#fff;border-color:var(--green);}
+.health-btn.normal.active{background:var(--orange);color:#fff;border-color:var(--orange);}
+.health-btn.caution.active{background:var(--red);color:#fff;border-color:var(--red);}
 .info-box{background:#FFF8E1;border-radius:8px;padding:10px 12px;font-size:12px;color:#7B5800;margin-top:10px;line-height:1.7;border-left:3px solid var(--yellow);}
 
 /* PPE */
@@ -119,6 +130,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .list-filter{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .list-filter select,.list-filter input[type="month"]{flex:1;min-width:120px;border:2px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--dark);background:#fff;outline:none;-webkit-appearance:none;}
 .list-filter select:focus,.list-filter input:focus{border-color:var(--orange);}
+.btn-bulk-print{background:var(--dark);color:var(--yellow);border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
+.btn-bulk-print:active{opacity:0.8;}
 .list-summary{display:flex;gap:8px;margin-bottom:14px;}
 .summary-card{flex:1;background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.1);}
 .summary-card .s-num{font-size:24px;font-weight:900;color:var(--orange);line-height:1;}
@@ -219,6 +232,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
   #page-list,#page-settings,.toast{display:none!important;}
   #preview-panel{display:block!important;box-shadow:none;padding:0;margin:0;border-radius:0;}
   body{background:#fff;font-family:'Noto Sans JP',sans-serif;}
+  .main{max-width:none!important;padding:0!important;margin:0!important;}
+  #page-form{padding:0!important;}
   .print-page{width:210mm;min-height:297mm;margin:0 auto;padding:15mm 15mm 20mm;box-sizing:border-box;}
   .print-header{display:flex!important;align-items:center;border-bottom:3px solid #1a1a1a;padding-bottom:10px;margin-bottom:14px;}
   .print-logo{background:#1a1a1a;color:#FFD600;font-size:18px;font-weight:900;padding:6px 14px;border-radius:6px;margin-right:14px;letter-spacing:0.05em;}
@@ -308,6 +323,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
       <div class="field"><label>作業員（タップで選択）</label>
         <div id="workerCheckList" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;"></div>
         <div class="tag-container" id="memberTags"></div>
+        <div id="healthCheckArea"></div>
         <div class="add-row" id="workerAddRow">
           <input type="text" id="workerInput" placeholder="新しい作業員名を入力">
           <button class="btn-inline-add" onclick="addNewWorker()">+</button>
@@ -320,7 +336,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
   <div class="card">
     <div class="card-header" onclick="toggleCard(3)">
       <div class="card-num" id="num3">3</div>
-      <div><div class="card-title">🔧 作業内容</div><div class="card-subtitle">種別・詳細・機械・保護具</div></div>
+      <div><div class="card-title">🔧 作業内容</div><div class="card-subtitle">種別・詳細・機械</div></div>
       <div class="card-chevron" id="chev3">▶</div>
     </div>
     <div class="card-body" id="body3">
@@ -331,10 +347,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
         <textarea id="workDetail" placeholder="例：〇〇階のコンクリート打設作業を実施。バイブレーター使用。" oninput="save();updateProgress()"></textarea>
       </div>
       <div class="field"><label>使用機械・工具</label>
-        <select id="equipment" onchange="save()"></select>
-      </div>
-      <div class="field"><label>保護具</label>
-        <div class="ppe-wrap" id="ppeWrap"></div>
+        <div class="ppe-wrap" id="equipWrap"></div>
       </div>
     </div>
   </div>
@@ -380,7 +393,9 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
   </div>
   <div class="list-filter">
     <input type="month" id="filterMonth" onchange="applyFilter()">
+    <button onclick="clearMonthFilter()" style="background:transparent;border:2px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;">全期間</button>
     <select id="filterSite" onchange="applyFilter()"><option value="">すべての現場</option></select>
+    <button class="btn-bulk-print" onclick="printAllFiltered()">📄 一括印刷</button>
   </div>
   <div id="recordList"></div>
 </div>
@@ -553,17 +568,19 @@ const PPE_ITEMS = ['ヘルメット','安全帯','安全靴','手袋','防塵マ
 
 // ===== 状態 =====
 let sites=[], workers=[], workTypes=[], equips=[];
-let members=[], risks=[], riskCount=0, ppeSelected=new Set();
+let members=[], risks=[], riskCount=0;
+let memberHealth={};
+let equipSelected=new Set();
 let _editingId=null;
 let isAdminUnlocked=false;
 let _pendingPage=null;
 let _recordsCache=[];
+let _filteredRecords=[];
 
 // ===== 初期化 =====
 window.onload = async function(){
   isAdminUnlocked = sessionStorage.getItem('ky_admin') === '1';
   await loadAll();
-  buildPPE();
   loadForm();
   if(risks.length===0) addRisk();
   updateProgress();
@@ -720,7 +737,7 @@ function renderWorkerChecks(){
   });
 }
 function toggleWorker(name){
-  if(members.includes(name)) members=members.filter(m=>m!==name);
+  if(members.includes(name)){ members=members.filter(m=>m!==name); delete memberHealth[name]; }
   else members.push(name);
   renderWorkerChecks(); renderTags(); save();
 }
@@ -729,10 +746,20 @@ function rebuildWorkTypeSelect(){
   sel.innerHTML='<option value="">作業を選択</option>';
   workTypes.forEach(t=>sel.add(new Option(t,t))); if(cur) sel.value=cur;
 }
-function rebuildEquipSelect(){
-  const sel=document.getElementById('equipment'); const cur=sel.value;
-  sel.innerHTML='<option value="">機械・工具を選択</option>';
-  equips.forEach(e=>sel.add(new Option(e,e))); if(cur) sel.value=cur;
+function rebuildEquipSelect(){ buildEquipButtons(); }
+function buildEquipButtons(){
+  const wrap=document.getElementById('equipWrap'); if(!wrap) return;
+  wrap.innerHTML='';
+  equips.forEach(item=>{
+    const btn=document.createElement('button'); btn.type='button'; btn.className='ppe-btn'; btn.dataset.item=item; btn.textContent=item;
+    if(equipSelected.has(item)) btn.classList.add('on');
+    btn.onclick=()=>{
+      if(equipSelected.has(item)){equipSelected.delete(item);btn.classList.remove('on');}
+      else{equipSelected.add(item);btn.classList.add('on');}
+      save();
+    };
+    wrap.appendChild(btn);
+  });
 }
 
 // ===== 現場 =====
@@ -783,7 +810,7 @@ function addNewWorker(){
   input.value=''; document.getElementById('workerAddRow').style.display='none';
   save(); showToast('✅ 作業員を登録・追加しました');
 }
-function removeMember(name){ members=members.filter(m=>m!==name); renderWorkerChecks(); renderTags(); save(); }
+function removeMember(name){ members=members.filter(m=>m!==name); delete memberHealth[name]; renderWorkerChecks(); renderTags(); save(); }
 function renderTags(){
   const c=document.getElementById('memberTags'); c.innerHTML='';
   members.forEach(name=>{
@@ -791,30 +818,53 @@ function renderTags(){
     t.innerHTML=`${name}<button class="tag-x" onclick="removeMember('${name}')">✕</button>`;
     c.appendChild(t);
   });
+  renderHealthChecks();
+}
+function renderHealthChecks(){
+  const area=document.getElementById('healthCheckArea'); if(!area) return;
+  if(members.length===0){ area.innerHTML=''; return; }
+  let html='<div class="health-check-area"><h4>🏥 体調確認</h4>';
+  members.forEach(name=>{
+    const h=memberHealth[name]||'';
+    html+=`<div class="health-row">
+      <span class="health-name">${name}</span>
+      <button class="health-btn good ${h==='良好'?'active':''}" onclick="setHealth('${name}','良好',this)">😊 良好</button>
+      <button class="health-btn normal ${h==='普通'?'active':''}" onclick="setHealth('${name}','普通',this)">😐 普通</button>
+      <button class="health-btn caution ${h==='要注意'?'active':''}" onclick="setHealth('${name}','要注意',this)">😟 要注意</button>
+    </div>`;
+  });
+  html+='</div>';
+  area.innerHTML=html;
+}
+function setHealth(name,status,btn){
+  memberHealth[name]=status;
+  btn.closest('.health-row').querySelectorAll('.health-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  save();
 }
 
-// ===== 保護具 =====
-function buildPPE(){
-  const wrap=document.getElementById('ppeWrap');
-  PPE_ITEMS.forEach(item=>{
-    const btn=document.createElement('button'); btn.type='button'; btn.className='ppe-btn'; btn.dataset.item=item; btn.textContent=item;
-    btn.onclick=()=>{
-      if(ppeSelected.has(item)){ppeSelected.delete(item);btn.classList.remove('on');}
-      else{ppeSelected.add(item);btn.classList.add('on');}
-      save();
-    };
-    wrap.appendChild(btn);
-  });
-}
 
 // ===== 危険ポイント =====
-function addRisk(){ riskCount++; risks.push({id:'r'+riskCount,danger:'',countermeasure:'',level:''}); renderRisks(); save(); updateProgress(); }
+function addRisk(){ riskCount++; risks.push({id:'r'+riskCount,danger:'',countermeasure:'',levelBefore:'',levelAfter:''}); renderRisks(); save(); updateProgress(); }
 function removeRisk(id){ risks=risks.filter(r=>r.id!==id); renderRisks(); save(); }
 function updateRisk(id,field,val){ const r=risks.find(r=>r.id===id); if(r){r[field]=val;save();} }
-function setRiskLevel(id,level,btn){
-  const r=risks.find(r=>r.id===id); if(r) r.level=level;
+function setRiskLevel(id,field,level,btn){
+  const r=risks.find(r=>r.id===id); if(r) r[field]=level;
   btn.closest('.risk-level').querySelectorAll('.rl-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); save();
+  btn.classList.add('active');
+  _renderScoreBadge(r);
+  save();
+}
+function levelVal(lv){ return lv==='high'?3:lv==='mid'?2:lv==='low'?1:0; }
+function calcScore(before,after){ const s=levelVal(before)-levelVal(after); return s>0?s:0; }
+function scoreColor(s){ return s>=2?'var(--green)':s===1?'var(--orange)':'#bbb'; }
+function scoreLabel(s){ return s>=2?'効果大':s===1?'効果あり':'未評価'; }
+function _renderScoreBadge(r){
+  const el=document.getElementById('score_'+r.id); if(!el) return;
+  if(!r.levelBefore||!r.levelAfter){ el.innerHTML=''; return; }
+  const s=calcScore(r.levelBefore,r.levelAfter);
+  const color=scoreColor(s);
+  el.innerHTML=`<span style="display:inline-flex;align-items:center;gap:6px;background:${color};color:#fff;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;">📊 低減効果 ${s}点 / ${scoreLabel(s)}</span>`;
 }
 function renderRisks(){
   const list=document.getElementById('riskList'); list.innerHTML='';
@@ -826,13 +876,21 @@ function renderRisks(){
       <textarea placeholder="例：足場が濡れていると → 滑って転落する危険がある" oninput="updateRisk('${r.id}','danger',this.value)">${r.danger}</textarea>
       <div class="risk-sub risk-gap">🛡️ 対策・行動目標</div>
       <textarea placeholder="例：作業前に足場の水分を拭き取り、滑り止めを確認してから登る" oninput="updateRisk('${r.id}','countermeasure',this.value)">${r.countermeasure}</textarea>
-      <div class="risk-sub risk-gap">リスクレベル</div>
+      <div class="risk-sub risk-gap">📊 発生前リスクレベル</div>
       <div class="risk-level">
-        <button class="rl-btn low ${r.level==='low'?'active':''}" onclick="setRiskLevel('${r.id}','low',this)">🟢 低</button>
-        <button class="rl-btn mid ${r.level==='mid'?'active':''}" onclick="setRiskLevel('${r.id}','mid',this)">🟠 中</button>
-        <button class="rl-btn high ${r.level==='high'?'active':''}" onclick="setRiskLevel('${r.id}','high',this)">🔴 高</button>
-      </div>`;
+        <button class="rl-btn low ${r.levelBefore==='low'?'active':''}" onclick="setRiskLevel('${r.id}','levelBefore','low',this)">🟢 低</button>
+        <button class="rl-btn mid ${r.levelBefore==='mid'?'active':''}" onclick="setRiskLevel('${r.id}','levelBefore','mid',this)">🟠 中</button>
+        <button class="rl-btn high ${r.levelBefore==='high'?'active':''}" onclick="setRiskLevel('${r.id}','levelBefore','high',this)">🔴 高</button>
+      </div>
+      <div class="risk-sub risk-gap">✅ 対策後リスクレベル</div>
+      <div class="risk-level">
+        <button class="rl-btn low ${r.levelAfter==='low'?'active':''}" onclick="setRiskLevel('${r.id}','levelAfter','low',this)">🟢 低</button>
+        <button class="rl-btn mid ${r.levelAfter==='mid'?'active':''}" onclick="setRiskLevel('${r.id}','levelAfter','mid',this)">🟠 中</button>
+        <button class="rl-btn high ${r.levelAfter==='high'?'active':''}" onclick="setRiskLevel('${r.id}','levelAfter','high',this)">🔴 高</button>
+      </div>
+      <div class="risk-score" id="score_${r.id}"></div>`;
     list.appendChild(div);
+    _renderScoreBadge(r);
   });
 }
 
@@ -909,10 +967,10 @@ function save(){
     leaderVal:document.getElementById('leaderSel').value,
     workType:document.getElementById('workType').value,
     workDetail:document.getElementById('workDetail').value,
-    equipment:document.getElementById('equipment').value,
+    equipment:Array.from(equipSelected),
     safetyGoal:document.getElementById('safetyGoal').value,
     notes:document.getElementById('notes').value,
-    members, risks, riskCount, ppe:Array.from(ppeSelected),
+    members, risks, riskCount, memberHealth,
   };
   localStorage.setItem('ky_form', JSON.stringify(data));
 }
@@ -927,11 +985,14 @@ function loadForm(){
   if(data.siteVal&&data.siteVal!=='__other__'){ const s=document.getElementById('siteName'); if([...s.options].some(o=>o.value===data.siteVal)) s.value=data.siteVal; }
   if(data.leaderVal){ const s=document.getElementById('leaderSel'); if([...s.options].some(o=>o.value===data.leaderVal)) s.value=data.leaderVal; }
   if(data.workType){ const s=document.getElementById('workType'); if([...s.options].some(o=>o.value===data.workType)) s.value=data.workType; }
-  if(data.equipment){ const s=document.getElementById('equipment'); if([...s.options].some(o=>o.value===data.equipment)) s.value=data.equipment; }
-  members=data.members||[]; renderWorkerChecks(); renderTags();
-  risks=data.risks||[]; riskCount=data.riskCount||0; renderRisks();
-  ppeSelected=new Set(data.ppe||[]);
-  document.querySelectorAll('.ppe-btn').forEach(b=>{ if(ppeSelected.has(b.dataset.item)) b.classList.add('on'); });
+  const rawEquip=data.equipment;
+  if(Array.isArray(rawEquip)) equipSelected=new Set(rawEquip);
+  else if(rawEquip) equipSelected=new Set([rawEquip]);
+  else equipSelected=new Set();
+  buildEquipButtons();
+  members=data.members||[]; memberHealth=data.memberHealth||{}; renderWorkerChecks(); renderTags();
+  risks=(data.risks||[]).map(r=>({...r,levelBefore:r.levelBefore||r.level||'',levelAfter:r.levelAfter||''}));
+  riskCount=data.riskCount||0; renderRisks();
   updateProgress();
 }
 function todayStr(){ return new Date().toISOString().split('T')[0]; }
@@ -978,9 +1039,9 @@ async function submitForm(){
     leader:lv, members:[...members],
     workType:document.getElementById('workType').value,
     workDetail:document.getElementById('workDetail').value,
-    equipment:document.getElementById('equipment').value,
-    ppe:Array.from(ppeSelected),
+    equipment:Array.from(equipSelected),
     risks:JSON.parse(JSON.stringify(risks)),
+    memberHealth:JSON.parse(JSON.stringify(memberHealth)),
     safetyGoal:document.getElementById('safetyGoal').value,
     notes:document.getElementById('notes').value,
   };
@@ -1012,8 +1073,7 @@ function buildPreview(){
   const mems=members.length?members.join('、'):'（未登録）';
   const wType=document.getElementById('workType').value||'（未選択）';
   const wDetail=document.getElementById('workDetail').value||'（未入力）';
-  const equip=document.getElementById('equipment').value||'－';
-  const ppe=Array.from(ppeSelected).join('、')||'－';
+  const equip=Array.from(equipSelected).join('、')||'－';
   const goal=document.getElementById('safetyGoal').value||'－';
   const notes=document.getElementById('notes').value||'－';
   const dateStr=date?new Date(date+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'（未入力）';
@@ -1024,7 +1084,7 @@ function buildPreview(){
   document.getElementById('preview-content').innerHTML=`
     <div class="preview-section"><h3>📅 基本情報</h3><table class="pt"><tr><th>作業日</th><td>${dateStr}</td></tr><tr><th>現場名</th><td>${site}</td></tr><tr><th>天候</th><td>${weather}</td></tr></table></div>
     <div class="preview-section"><h3>👷 参加者</h3><table class="pt"><tr><th>責任者</th><td>${leaderName}</td></tr><tr><th>作業員</th><td>${mems}</td></tr></table></div>
-    <div class="preview-section"><h3>🔧 作業内容</h3><table class="pt"><tr><th>作業種別</th><td>${wType}</td></tr><tr><th>作業詳細</th><td>${wDetail}</td></tr><tr><th>機械・工具</th><td>${equip}</td></tr><tr><th>保護具</th><td>${ppe}</td></tr></table></div>
+    <div class="preview-section"><h3>🔧 作業内容</h3><table class="pt"><tr><th>作業種別</th><td>${wType}</td></tr><tr><th>作業詳細</th><td>${wDetail}</td></tr><tr><th>機械・工具</th><td>${equip}</td></tr></table></div>
     <div class="preview-section"><h3>⚠️ 危険ポイント・対策</h3><table class="pt">${riskHTML||'<tr><td colspan="2">（未入力）</td></tr>'}</table></div>
     <div class="preview-section"><h3>🎯 安全目標・連絡</h3><table class="pt"><tr><th>安全目標</th><td>${goal}</td></tr><tr><th>特記事項</th><td>${notes}</td></tr></table></div>
     <div style="text-align:center;margin-top:14px;padding-top:10px;border-top:1px solid #eee"><p style="font-size:11px;color:#999">作成：${new Date().toLocaleString('ja-JP')}</p></div>`;
@@ -1047,6 +1107,10 @@ async function renderList(){
   }
 }
 
+function clearMonthFilter(){
+  document.getElementById('filterMonth').value='';
+  applyFilter();
+}
 function applyFilter(){
   const container=document.getElementById('recordList');
   const fm=document.getElementById('filterMonth').value;
@@ -1064,7 +1128,7 @@ async function updateSummary(){
     const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     document.getElementById('sum-total').textContent=recs.length;
     document.getElementById('sum-month').textContent=recs.filter(r=>r.workDate&&r.workDate.startsWith(ym)).length;
-    document.getElementById('sum-high').textContent=recs.reduce((s,r)=>s+(r.risks||[]).filter(x=>x.level==='high').length, 0);
+    document.getElementById('sum-high').textContent=recs.reduce((s,r)=>s+(r.risks||[]).filter(x=>(x.levelBefore||x.level)==='high').length, 0);
   } catch(e){}
 }
 
@@ -1073,6 +1137,7 @@ function _renderRecordCards(recs,fm,fs,container){
   if(fm) filtered=filtered.filter(r=>r.workDate&&r.workDate.startsWith(fm));
   if(fs) filtered=filtered.filter(r=>r.site===fs);
   filtered.sort((a,b)=>(b.workDate||'').localeCompare(a.workDate||''));
+  _filteredRecords=[...filtered];
   if(filtered.length===0){
     container.innerHTML=`<div class="list-empty"><div class="empty-icon">📭</div><p>この期間の記録はありません。<br>入力ページでKY記録を保存すると<br>ここに表示されます。</p></div>`;
     return;
@@ -1081,8 +1146,8 @@ function _renderRecordCards(recs,fm,fs,container){
     const d=new Date(rec.workDate+'T00:00:00');
     const month=`${d.getMonth()+1}月`; const day=d.getDate();
     const dow=['日','月','火','水','木','金','土'][d.getDay()];
-    const highR=(rec.risks||[]).filter(r=>r.level==='high').length;
-    const midR=(rec.risks||[]).filter(r=>r.level==='mid').length;
+    const highR=(rec.risks||[]).filter(r=>(r.levelBefore||r.level)==='high').length;
+    const midR=(rec.risks||[]).filter(r=>(r.levelBefore||r.level)==='mid').length;
     let badgeHTML='';
     if(rec.workType) badgeHTML+=`<span class="record-badge">${rec.workType}</span>`;
     if(highR>0) badgeHTML+=`<span class="record-badge has-high">🔴 高リスク×${highR}</span>`;
@@ -1113,11 +1178,19 @@ function _renderRecordCards(recs,fm,fs,container){
 
 function buildRecordDetailHTML(rec){
   const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'－';
-  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'（なし）';
-  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):'－';
+  const mems=(rec.members&&rec.members.length)?rec.members.map(m=>{
+    const h=(rec.memberHealth||{})[m];
+    const icon=h==='良好'?'😊':h==='普通'?'😐':h==='要注意'?'😟':'';
+    return h?`${m}（${icon}${h}）`:m;
+  }).join('、'):'（なし）';
   const risksHTML=(rec.risks||[]).map((r,i)=>{
-    const badge=r.level==='low'?'<span class="rb low">低</span>':r.level==='mid'?'<span class="rb mid">中</span>':r.level==='high'?'<span class="rb high">高</span>':'';
-    return`<div class="detail-risk-block"><div class="detail-risk-label">⚠️ 危険ポイント ${i+1} ${badge}</div><div class="detail-risk-danger">${r.danger||'（未入力）'}</div><div class="detail-risk-measure">🛡️ 対策：${r.countermeasure||'－'}</div></div>`;
+    const lb=r.levelBefore||r.level||'';
+    const la=r.levelAfter||'';
+    const bBadge=lb==='low'?'<span class="rb low">低</span>':lb==='mid'?'<span class="rb mid">中</span>':lb==='high'?'<span class="rb high">高</span>':'';
+    const aBadge=la==='low'?'<span class="rb low">低</span>':la==='mid'?'<span class="rb mid">中</span>':la==='high'?'<span class="rb high">高</span>':'';
+    const sc=calcScore(lb,la);
+    const scoreStr=(lb&&la)?` <span style="color:${scoreColor(sc)};font-size:11px;font-weight:700;">→ 対策後:${aBadge} [低減${sc}点]</span>`:'';
+    return`<div class="detail-risk-block"><div class="detail-risk-label">⚠️ 危険ポイント ${i+1} ${bBadge}${scoreStr}</div><div class="detail-risk-danger">${r.danger||'（未入力）'}</div><div class="detail-risk-measure">🛡️ 対策：${r.countermeasure||'－'}</div></div>`;
   }).join('')||'<p style="font-size:13px;color:#999">なし</p>';
   return`
     <div class="detail-section"><div class="detail-section-title">📅 基本情報</div>
@@ -1127,7 +1200,7 @@ function buildRecordDetailHTML(rec){
       <table class="detail-table"><tr><th>責任者</th><td>${rec.leader||'－'}</td></tr><tr><th>作業員</th><td>${mems}</td></tr></table>
     </div>
     <div class="detail-section"><div class="detail-section-title">🔧 作業内容</div>
-      <table class="detail-table"><tr><th>作業種別</th><td>${rec.workType||'－'}</td></tr><tr><th>作業詳細</th><td>${rec.workDetail||'－'}</td></tr><tr><th>機械・工具</th><td>${rec.equipment||'－'}</td></tr><tr><th>保護具</th><td>${ppe}</td></tr></table>
+      <table class="detail-table"><tr><th>作業種別</th><td>${rec.workType||'－'}</td></tr><tr><th>作業詳細</th><td>${rec.workDetail||'－'}</td></tr><tr><th>機械・工具</th><td>${Array.isArray(rec.equipment)?rec.equipment.join('、'):(rec.equipment||'－')}</td></tr></table>
     </div>
     <div class="detail-section"><div class="detail-section-title">⚠️ 危険ポイント・対策</div>${risksHTML}</div>
     <div class="detail-section"><div class="detail-section-title">🎯 安全目標・連絡</div>
@@ -1150,6 +1223,19 @@ function printRecord(id){
   showPage('form');
   setTimeout(()=>window.print(), 300);
 }
+function printAllFiltered(){
+  if(_filteredRecords.length===0){ showToast('⚠️ 印刷する記録がありません'); return; }
+  const panel=document.getElementById('preview-panel');
+  panel.innerHTML=_filteredRecords.map((rec,i)=>{
+    const html=buildPrintPreview(rec);
+    return i<_filteredRecords.length-1
+      ? html.replace('<div class="print-page">','<div class="print-page" style="page-break-after:always">')
+      : html;
+  }).join('');
+  panel.style.display='block';
+  showPage('form');
+  setTimeout(()=>window.print(), 300);
+}
 
 function editRecord(id){
   const rec=_recordsCache.find(r=>r.id===id); if(!rec) return;
@@ -1161,11 +1247,14 @@ function editRecord(id){
   const ss=document.getElementById('siteName'); if([...ss.options].some(o=>o.value===rec.site)) ss.value=rec.site;
   const ls=document.getElementById('leaderSel'); if([...ls.options].some(o=>o.value===rec.leader)) ls.value=rec.leader;
   const wt=document.getElementById('workType'); if([...wt.options].some(o=>o.value===rec.workType)) wt.value=rec.workType;
-  const eq=document.getElementById('equipment'); if([...eq.options].some(o=>o.value===rec.equipment)) eq.value=rec.equipment;
-  members=[...rec.members||[]]; renderWorkerChecks(); renderTags();
-  risks=JSON.parse(JSON.stringify(rec.risks||[])); riskCount=risks.length; renderRisks();
-  ppeSelected=new Set(rec.ppe||[]);
-  document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.toggle('on', ppeSelected.has(b.dataset.item)));
+  const rawEquip=rec.equipment;
+  if(Array.isArray(rawEquip)) equipSelected=new Set(rawEquip);
+  else if(rawEquip) equipSelected=new Set([rawEquip]);
+  else equipSelected=new Set();
+  buildEquipButtons();
+  members=[...rec.members||[]]; memberHealth=JSON.parse(JSON.stringify(rec.memberHealth||{})); renderWorkerChecks(); renderTags();
+  risks=JSON.parse(JSON.stringify(rec.risks||[])).map(r=>({...r,levelBefore:r.levelBefore||r.level||'',levelAfter:r.levelAfter||''}));
+  riskCount=risks.length; renderRisks();
   _editingId=rec.id;
   save(); showPage('form'); updateProgress(); showToast('✏️ 編集モードで読み込みました');
 }
@@ -1184,13 +1273,12 @@ async function deleteRecord(id){
 function resetToday(){
   if(!confirm('今日の入力内容をリセットしますか？')) return;
   localStorage.removeItem('ky_form');
-  members=[]; risks=[]; riskCount=0; ppeSelected.clear();
-  document.querySelectorAll('.ppe-btn').forEach(b=>b.classList.remove('on'));
+  members=[]; risks=[]; riskCount=0; equipSelected.clear(); memberHealth={};
+  buildEquipButtons();
   ['workDate','weather','leaderSel','workType','workDetail','safetyGoal','notes'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   document.getElementById('siteName').value='';
-  document.getElementById('equipment').value='';
   document.getElementById('siteAddRow').style.display='none';
   document.getElementById('leaderAddRow').style.display='none';
   document.getElementById('workerAddRow').style.display='none';
@@ -1222,7 +1310,7 @@ async function openTplSheet(){
     recs.sort((a,b)=>(b.savedAt||'').localeCompare(a.savedAt||'')).forEach(rec=>{
       (rec.risks||[]).forEach(r=>{
         if(r.danger&&r.danger.trim()){
-          allRisks.push({date:rec.workDate,site:rec.site,danger:r.danger,countermeasure:r.countermeasure,level:r.level});
+          allRisks.push({date:rec.workDate,site:rec.site,danger:r.danger,countermeasure:r.countermeasure,levelBefore:r.levelBefore||r.level||'',levelAfter:r.levelAfter||''});
         }
       });
     });
@@ -1233,7 +1321,8 @@ async function openTplSheet(){
     const seen=new Set();
     const unique=allRisks.filter(r=>{ const k=r.danger.trim(); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,20);
     list.innerHTML=unique.map((r,i)=>{
-      const levelStr=r.level==='high'?'🔴 高':r.level==='mid'?'🟠 中':r.level==='low'?'🟢 低':'';
+      const lb=r.levelBefore||'';
+      const levelStr=lb==='high'?'🔴 高':lb==='mid'?'🟠 中':lb==='low'?'🟢 低':'';
       return`<div class="tpl-item" onclick="applyTemplate(${i})">
         <div class="tpl-item-date">${r.date||''} ${r.site||''} ${levelStr}</div>
         <div class="tpl-item-danger">${r.danger}</div>
@@ -1253,7 +1342,7 @@ function applyTemplate(i){
   const list=document.getElementById('tplList');
   const item=list._data&&list._data[i]; if(!item) return;
   riskCount++;
-  risks.push({id:'r'+riskCount,danger:item.danger,countermeasure:item.countermeasure||'',level:item.level||''});
+  risks.push({id:'r'+riskCount,danger:item.danger,countermeasure:item.countermeasure||'',levelBefore:item.levelBefore||'',levelAfter:''});
   renderRisks(); save();
   document.getElementById('tplOverlay').classList.remove('open');
   showToast('✅ 危険ポイントを引用しました');
@@ -1264,12 +1353,21 @@ function applyTemplate(i){
 // ===== A4印刷 =====
 function buildPrintPreview(rec){
   const dateStr=rec.workDate?new Date(rec.workDate+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}):'';
-  const mems=(rec.members&&rec.members.length)?rec.members.join('、'):'－';
-  const ppe=(rec.ppe&&rec.ppe.length)?rec.ppe.join('、'):'－';
+  const mems=(rec.members&&rec.members.length)?rec.members.map(m=>{
+    const h=(rec.memberHealth||{})[m];
+    const abbr=h==='良好'?'良':h==='普通'?'普':h==='要注意'?'注':'';
+    return abbr?`${m}(${abbr})`:m;
+  }).join('、'):'－';
+  const equip=Array.isArray(rec.equipment)?rec.equipment.join('、'):(rec.equipment||'－');
   const risksHTML=(rec.risks||[]).map((r,i)=>{
-    const lvStr=r.level==='high'?'<span class="rb-print-high">●高</span>':r.level==='mid'?'<span class="rb-print-mid">●中</span>':r.level==='low'?'<span class="rb-print-low">●低</span>':'';
+    const lb=r.levelBefore||r.level||'';
+    const la=r.levelAfter||'';
+    const lvStr=lb==='high'?'<span class="rb-print-high">●高</span>':lb==='mid'?'<span class="rb-print-mid">●中</span>':lb==='low'?'<span class="rb-print-low">●低</span>':'';
+    const sc=calcScore(lb,la);
+    const afterLabel=la==='high'?'高':la==='mid'?'中':la==='low'?'低':'';
+    const scoreStr=(lb&&la)?` <span style="font-size:10px;color:#555">→ 対策後:${afterLabel} [低減${sc}点]</span>`:'';
     return`<div class="print-risk-block">
-      <div class="print-risk-num">危険ポイント ${i+1} ${lvStr}</div>
+      <div class="print-risk-num">危険ポイント ${i+1} ${lvStr}${scoreStr}</div>
       <div class="print-risk-danger">${r.danger||'－'}</div>
       ${r.countermeasure?`<div class="print-risk-measure">🛡️ 対策：${r.countermeasure}</div>`:''}
     </div>`;
@@ -1278,7 +1376,6 @@ function buildPrintPreview(rec){
     <div class="print-header">
       <div class="print-logo">KY</div>
       <div class="print-title">危険予知活動記録票</div>
-      <div class="print-date-box">作成：${new Date(rec.savedAt||Date.now()).toLocaleDateString('ja-JP')}</div>
     </div>
     <div class="print-section"><div class="print-section-title">基本情報</div>
       <table class="print-table">
@@ -1293,9 +1390,9 @@ function buildPrintPreview(rec){
     </div>
     <div class="print-section"><div class="print-section-title">作業内容</div>
       <table class="print-table">
-        <tr><th>作業種別</th><td>${rec.workType||'－'}</td><th>機械・工具</th><td>${rec.equipment||'－'}</td></tr>
+        <tr><th>作業種別</th><td colspan="3">${rec.workType||'－'}</td></tr>
+        <tr><th>機械・工具</th><td colspan="3">${equip}</td></tr>
         <tr><th>作業詳細</th><td colspan="3">${(rec.workDetail||'－').replace(/\n/g,'<br>')}</td></tr>
-        <tr><th>保護具</th><td colspan="3">${ppe}</td></tr>
       </table>
     </div>
     <div class="print-section"><div class="print-section-title">危険ポイント・対策</div>${risksHTML||'<p style="font-size:12px;color:#999">なし</p>'}</div>
@@ -1304,11 +1401,6 @@ function buildPrintPreview(rec){
         <tr><th>安全目標</th><td>${rec.safetyGoal||'－'}</td></tr>
         <tr><th>特記事項</th><td>${(rec.notes||'－').replace(/\n/g,'<br>')}</td></tr>
       </table>
-    </div>
-    <div class="print-sign">
-      <div class="print-sign-box"><div class="print-sign-label">責任者確認</div><div class="print-sign-line">署名</div></div>
-      <div class="print-sign-box"><div class="print-sign-label">現場監督確認</div><div class="print-sign-line">署名</div></div>
-      <div class="print-sign-box"><div class="print-sign-label">安全管理者確認</div><div class="print-sign-line">署名</div></div>
     </div>
   </div>`;
 }

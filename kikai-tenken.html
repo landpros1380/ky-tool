@@ -166,86 +166,40 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .settings-hint{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.6;}
 .settings-reset-btn{width:100%;background:transparent;border:2px dashed var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:8px;}
 
-/* BATCH PRINT OVERLAY */
-.tpl-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:flex-end;pointer-events:none;visibility:hidden;}
-.tpl-overlay.open{pointer-events:auto;visibility:visible;}
-.batch-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:22px 16px 40px;}
-.batch-title{font-size:17px;font-weight:900;color:var(--dark);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
-.tpl-close{background:none;border:none;font-size:24px;color:#aaa;cursor:pointer;padding:0;line-height:1;}
-.radio-row{display:flex;gap:16px;margin-top:8px;}
-.radio-row label{display:flex;align-items:center;gap:6px;font-size:15px;text-transform:none;letter-spacing:0;color:var(--dark);cursor:pointer;font-weight:700;}
-.radio-row input[type="radio"]{width:auto;height:auto;padding:0;border:none;}
-
 /* TOAST */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.82);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:400;}
 .toast.show{opacity:1;}
 
-/* PRINT - normal */
+/* PRINT */
+@page{size:A4;margin:10mm;}
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  body:not(.printing-batch) .header,
-  body:not(.printing-batch) .page,
-  body:not(.printing-batch) .toast,
-  body:not(.printing-batch) .tpl-overlay,
-  body:not(.printing-batch) #batchPrintPage{display:none!important;}
-  body:not(.printing-batch) #page-form{display:block!important;}
-  body:not(.printing-batch) .card,
-  body:not(.printing-batch) .btn-submit,
-  body:not(.printing-batch) .btn-reset,
-  body:not(.printing-batch) .progress-bar,
-  body:not(.printing-batch) .progress-label{display:none!important;}
-  body:not(.printing-batch) #preview-panel{display:block!important;}
-  body:not(.printing-batch) .main{max-width:none!important;padding:0!important;margin:0!important;}
   body{background:#fff;}
-  .print-page{width:210mm;min-height:297mm;margin:0 auto;padding:12mm 15mm 15mm;box-sizing:border-box;}
-  .print-header{display:flex!important;align-items:center;border-bottom:3px solid #1a1a1a;padding-bottom:10px;margin-bottom:14px;}
-  .print-logo{background:#1a1a1a;color:#FFD600;font-size:13px;font-weight:900;padding:4px 10px;border-radius:4px;margin-right:10px;}
-  .print-h-title{font-size:20px;font-weight:900;letter-spacing:0.08em;flex:1;}
-  .print-date-box{font-size:11px;color:#444;text-align:right;}
-  .print-section{margin-bottom:10px;}
-  .pst{background:#1a1a1a;color:#FFD600;font-size:11px;font-weight:900;padding:3px 8px;display:inline-block;letter-spacing:0.08em;margin-bottom:5px;border-radius:3px;}
-  .print-table{width:100%;border-collapse:collapse;font-size:12px;}
-  .print-table th{background:#f0f0f0;text-align:left;padding:5px 8px;font-weight:700;border:1px solid #ccc;width:28%;vertical-align:top;}
-  .print-table td{padding:5px 8px;border:1px solid #ccc;vertical-align:top;line-height:1.5;}
-  .p-chk-table{width:100%;border-collapse:collapse;font-size:11px;}
-  .p-chk-table th{background:#f0f0f0;padding:4px 6px;font-weight:700;border:1px solid #ccc;text-align:center;}
-  .p-chk-table th:first-child{text-align:left;width:50%;}
-  .p-chk-table td{padding:4px 5px;border:1px solid #ccc;text-align:center;vertical-align:middle;}
-  .p-chk-table td:first-child{text-align:left;line-height:1.4;}
-  .p-chk-table td.nc{font-size:10px;text-align:left;color:#555;}
-  .psok{color:#00A651;font-weight:900;font-size:13px;}
-  .pscau{color:#FF6B00;font-weight:900;font-size:13px;}
-  .psng{color:#D32F2F;font-weight:900;font-size:13px;}
-  .psna{color:#9E9E9E;font-weight:900;font-size:13px;}
-  .psnone{color:#bbb;}
-  .print-sign{display:flex!important;gap:16px;margin-top:12px;}
-  .print-sign-box{flex:1;border:1px solid #ccc;border-radius:4px;padding:10px;text-align:center;}
-  .psbl{font-size:10px;color:#666;margin-bottom:22px;}
-  .psll{border-top:1px solid #ccc;margin-top:8px;padding-top:4px;font-size:10px;color:#999;}
-
-  /* BATCH PRINT */
-  body.printing-batch *{display:none!important;}
-  body.printing-batch #batchPrintPage{display:block!important;}
-  .bp-wrap{font-family:'Noto Sans JP',sans-serif;padding:10mm 10mm 12mm;}
-  .bp-head{display:flex!important;align-items:flex-start;border-bottom:3px solid #1a1a1a;padding-bottom:8px;margin-bottom:10px;gap:10px;}
-  .bp-logo{background:#1a1a1a;color:#FFD600;font-size:12px;font-weight:900;padding:4px 10px;border-radius:4px;white-space:nowrap;}
-  .bp-htitle{font-size:17px;font-weight:900;flex:1;}
-  .bp-meta{font-size:10px;color:#555;margin-top:2px;}
-  .bp-stitle{background:#1a1a1a;color:#FFD600;font-size:10px;font-weight:900;padding:2px 8px;display:inline-block;letter-spacing:0.08em;margin:8px 0 4px;border-radius:3px;}
-  .bp-tbl{width:100%;border-collapse:collapse;}
-  .bp-tbl th{background:#f0f0f0;padding:3px 2px;font-weight:700;border:1px solid #ccc;text-align:center;font-size:9px;line-height:1.3;}
-  .bp-tbl th:first-child{text-align:left;width:30%;}
-  .bp-tbl td{padding:3px 2px;border:1px solid #ccc;text-align:center;font-size:11px;}
-  .bp-tbl td:first-child{text-align:left;font-size:9px;line-height:1.3;}
-  .bp-tbl td.bp-insp{font-size:8px;}
-  .bpok{color:#00A651;font-weight:900;}
-  .bpcau{color:#FF6B00;font-weight:900;}
-  .bpng{color:#D32F2F;font-weight:900;}
-  .bpna{color:#9E9E9E;}
-  .bp-sign{display:flex!important;gap:12px;margin-top:12px;}
-  .bp-sign-box{flex:1;border:1px solid #ccc;border-radius:3px;padding:8px;text-align:center;}
-  .bp-slbl{font-size:9px;color:#666;margin-bottom:18px;}
-  .bp-sline{border-top:1px solid #ccc;margin-top:6px;padding-top:3px;font-size:9px;color:#999;}
+  body.is-bulk-printing > *{display:none!important;}
+  body.is-bulk-printing > #bulkPrintContent{display:block!important;}
+  .print-page{width:100%;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;}
+  .print-header{display:flex;align-items:center;border-bottom:3px solid #1a1a1a;padding-bottom:7px;margin-bottom:9px;}
+  .print-logo{background:#1a1a1a;color:#FFD600;font-size:12px;font-weight:900;padding:3px 8px;border-radius:4px;margin-right:10px;}
+  .print-h-title{font-size:17px;font-weight:900;letter-spacing:0.08em;flex:1;}
+  .print-date-box{display:none!important;}
+  .preview-title{font-size:15px;font-weight:900;text-align:center;border-bottom:2px solid #1a1a1a;padding-bottom:7px;margin-bottom:9px;letter-spacing:0.1em;}
+  .preview-section{margin-bottom:7px;}
+  .preview-section h3{font-size:10px;font-weight:900;color:#FFD600;background:#1a1a1a;padding:2px 7px;border-radius:3px;display:inline-block;letter-spacing:0.08em;margin-bottom:4px;}
+  .pt{width:100%;border-collapse:collapse;font-size:10.5px;}
+  .pt th{background:#f0f0f0;text-align:left;padding:3px 6px;font-weight:700;border:1px solid #ccc;width:28%;vertical-align:top;}
+  .pt td{padding:3px 6px;border:1px solid #ccc;vertical-align:top;line-height:1.4;}
+  .pv-row{display:flex;justify-content:space-between;align-items:flex-start;padding:3px 0;border-bottom:1px solid #e0e0e0;gap:8px;font-size:10.5px;}
+  .pv-row:last-child{border-bottom:none;}
+  .pv-name{flex:1;}
+  .pv-note{font-size:9px;color:#666;margin-top:1px;}
+  .pv-st{font-weight:900;font-size:12px;flex-shrink:0;}
+  .pv-st.ok{color:#00A651;}
+  .pv-st.caution{color:#FF6B00;}
+  .pv-st.ng{color:#D32F2F;}
+  .pv-st.na{color:#9E9E9E;}
+  .pv-ampm{display:flex;align-items:center;gap:5px;margin-top:1px;}
+  .pv-albl{font-size:9px;font-weight:700;color:#666;}
+  .print-sign{display:none!important;}
 }
 </style>
 </head>
@@ -296,38 +250,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
   <div class="settings-page" id="settingsContainer"></div>
 </div>
 
-<!-- BATCH PRINT OVERLAY -->
-<div class="tpl-overlay" id="batchOverlay" onclick="closeBatchIfOutside(event)">
-  <div class="batch-sheet">
-    <div class="batch-title">
-      <span>📊 まとめ印刷 — 機械点検簿</span>
-      <button class="tpl-close" onclick="closeBatch()">×</button>
-    </div>
-    <div class="field">
-      <label>機械名</label>
-      <select id="batchMachine"></select>
-    </div>
-    <div class="field">
-      <label>集計期間</label>
-      <div class="radio-row">
-        <label><input type="radio" name="batchPeriod" value="week" checked onchange="onBatchPeriodChange()">週間</label>
-        <label><input type="radio" name="batchPeriod" value="month" onchange="onBatchPeriodChange()">月間</label>
-      </div>
-    </div>
-    <div class="field">
-      <label id="batchDateLabel">週の開始日（月曜日）</label>
-      <input type="date" id="batchDate">
-    </div>
-    <button class="btn-submit" style="margin-top:18px" onclick="doBatchPrint()">🖨️ 印刷する</button>
-  </div>
-</div>
-
-<!-- BATCH PRINT PAGE (hidden, shown during print) -->
-<div id="batchPrintPage" style="display:none">
-  <div id="batchPrintContent"></div>
-</div>
-
 <div class="toast" id="toast"></div>
+<div id="bulkPrintContent" style="display:none"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -370,6 +294,7 @@ const DEF_SETTINGS = {
    STATE
    ============================================================ */
 let records, settings, draft, editId = null;
+let _filteredRecords = [];
 
 async function load() {
   // --- 設定の読み込み ---
@@ -650,9 +575,26 @@ function saveSettings() {
 /* ============================================================
    PREVIEW & PRINT
    ============================================================ */
+function buildFullPrintHTML(r) {
+  const header = `<div class="print-header"><div class="print-logo">機械点検</div><div class="print-h-title">機械点検簿</div></div>`;
+  return `<div class="print-page">${header}${previewHTML(r)}</div>`;
+}
+
+function doPrint(htmlPages) {
+  el('bulkPrintContent').innerHTML = htmlPages;
+  el('bulkPrintContent').style.display = 'block';
+  document.body.classList.add('is-bulk-printing');
+  setTimeout(() => {
+    window.print();
+    document.body.classList.remove('is-bulk-printing');
+    el('bulkPrintContent').style.display = 'none';
+    el('bulkPrintContent').innerHTML = '';
+  }, 250);
+}
+
 function togglePreview() {
   const p = el('preview-panel');
-  if (p.style.display==='block') { p.style.display='none'; el('btnPreview').textContent='👁️ プレビュー・印刷'; }
+  if (p.style.display==='block') { doPrint(buildFullPrintHTML(draft)); }
   else { buildPreview(draft); p.style.display='block'; el('btnPreview').textContent='🖨️ 印刷する'; p.scrollIntoView({behavior:'smooth'}); }
 }
 
@@ -687,11 +629,6 @@ function previewHTML(d) {
       <tr><th>処置内容・対応状況</th><td style="white-space:pre-wrap">${escHtml(d.action||'（なし）')}</td></tr>
       <tr><th>確認者・責任者</th><td>${escHtml(d.confirmer||'')}</td></tr>
     </table></div>`;
-  h += `<div class="print-sign" style="display:none;">
-    <div class="print-sign-box"><div class="psbl">点検者</div><div class="psll">署名欄</div></div>
-    <div class="print-sign-box"><div class="psbl">確認者</div><div class="psll">署名欄</div></div>
-    <div class="print-sign-box"><div class="psbl">現場責任者</div><div class="psll">署名欄</div></div>
-  </div>`;
   return h;
 }
 
@@ -766,7 +703,7 @@ function renderList() {
       <option value="caution">要注意あり</option>
       <option value="ok">全項目良好</option>
     </select>
-    <button class="btn-batch" onclick="openBatch()">📊 まとめ印刷</button>`;
+    <button class="btn-batch" onclick="printAllFiltered()">📄 一括印刷</button>`;
   setFilterMonth();
 
   const month   = el('filterMonth')   ? el('filterMonth').value   : '';
@@ -784,6 +721,7 @@ function renderList() {
     }
     return true;
   });
+  _filteredRecords = recs;
 
   const totalNg = recs.reduce((n,r)=>n+recordStatuses(r).filter(s=>s==='ng').length, 0);
   el('listSummary').innerHTML = `
@@ -872,11 +810,19 @@ function detailSingleChecks(title, checks) {
 }
 
 function printRecord(id) {
-  const r=records.find(r=>r.id===id); if(!r) return;
-  buildPreview(r);
-  el('preview-panel').style.display='block';
-  showPage('form');
-  setTimeout(()=>{ window.print(); el('preview-panel').style.display='none'; showPage('list'); },200);
+  const r = records.find(r => r.id === id); if (!r) return;
+  doPrint(buildFullPrintHTML(r));
+}
+
+function printAllFiltered() {
+  if (!_filteredRecords.length) { showToast('印刷する記録がありません'); return; }
+  const html = _filteredRecords.map((r, i) => {
+    const page = buildFullPrintHTML(r);
+    return i < _filteredRecords.length - 1
+      ? page.replace('<div class="print-page">', '<div class="print-page" style="page-break-after:always">')
+      : page;
+  }).join('');
+  doPrint(html);
 }
 
 function editRecord(id) {
@@ -896,164 +842,6 @@ function deleteRecord(id) {
       .catch(e => console.warn('Firestore deleteRecord failed', e));
   }
   renderList(); showToast('削除しました');
-}
-
-/* ============================================================
-   BATCH PRINT
-   ============================================================ */
-function openBatch() {
-  const sel=el('batchMachine');
-  sel.innerHTML=`<option value="">すべての機械</option>`+(settings.machines||[]).map(m=>`<option>${escHtml(m)}</option>`).join('');
-  const cf=el('filterMachine');
-  if(cf&&cf.value) sel.value=cf.value;
-  el('batchDate').value = today();
-  onBatchPeriodChange();
-  el('batchOverlay').classList.add('open');
-}
-function closeBatch() { el('batchOverlay').classList.remove('open'); }
-function closeBatchIfOutside(e) { if(e.target===el('batchOverlay')) closeBatch(); }
-
-function onBatchPeriodChange() {
-  const isWeek = document.querySelector('input[name="batchPeriod"]:checked').value==='week';
-  el('batchDateLabel').textContent = isWeek ? '週の開始日（月曜日）' : '対象月';
-  const dateInput = el('batchDate');
-  if (isWeek) {
-    dateInput.type='date';
-    const d=new Date(), dow=d.getDay(), mon=new Date(d);
-    mon.setDate(d.getDate()-(dow===0?6:dow-1));
-    dateInput.value=mon.toISOString().split('T')[0];
-  } else {
-    dateInput.type='month';
-    const d=new Date();
-    dateInput.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  }
-}
-
-function doBatchPrint() {
-  const machine = el('batchMachine').value;
-  const period  = document.querySelector('input[name="batchPeriod"]:checked').value;
-  const dateVal = el('batchDate').value;
-  if (!dateVal) { showToast('期間を選択してください'); return; }
-
-  const isWeek = period==='week';
-  const dates  = isWeek ? getWeekDates(dateVal) : getMonthDates(dateVal);
-  const recs   = records.filter(r =>
-    (!machine || r.machineName===machine) && dates.includes(r.date)
-  );
-
-  const byDate = {};
-  recs.forEach(r => { if(!byDate[r.date]||r.id>byDate[r.date].id) byDate[r.date]=r; });
-  const activeDates = isWeek ? dates : dates.filter(d=>byDate[d]);
-
-  if (!activeDates.length) { showToast('選択した期間に記録がありません'); return; }
-
-  const content = buildBatchHTML(machine, activeDates, byDate, isWeek);
-  el('batchPrintContent').innerHTML = content;
-  closeBatch();
-
-  let lsEl=null;
-  if (!isWeek) {
-    lsEl=document.createElement('style');
-    lsEl.id='bpLandscape';
-    lsEl.textContent='@page{size:A4 landscape;}';
-    document.head.appendChild(lsEl);
-  }
-
-  document.body.classList.add('printing-batch');
-  el('batchPrintPage').style.display='block';
-  setTimeout(()=>{
-    window.print();
-    document.body.classList.remove('printing-batch');
-    el('batchPrintPage').style.display='none';
-    if(lsEl) lsEl.remove();
-  }, 200);
-}
-
-function getWeekDates(dateStr) {
-  const d=new Date(dateStr+'T00:00:00'), dow=d.getDay();
-  const mon=new Date(d); mon.setDate(d.getDate()-(dow===0?6:dow-1));
-  return Array.from({length:7},(_,i)=>{ const x=new Date(mon); x.setDate(mon.getDate()+i); return x.toISOString().split('T')[0]; });
-}
-
-function getMonthDates(monthStr) {
-  const [y,m]=monthStr.split('-').map(Number);
-  const days=new Date(y,m,0).getDate();
-  return Array.from({length:days},(_,i)=>{ const d=new Date(y,m-1,i+1); return d.toISOString().split('T')[0]; });
-}
-
-function bpSym(status) {
-  if(status==='ok')      return '<span class="bpok">◯</span>';
-  if(status==='caution') return '<span class="bpcau">△</span>';
-  if(status==='ng')      return '<span class="bpng">×</span>';
-  if(status==='na')      return '<span class="bpna">ー</span>';
-  return '<span style="color:#ddd">－</span>';
-}
-
-function buildBatchHTML(machine, dates, byDate, isWeek) {
-  const basicItems  = settings.basicItems  || [];
-  const safetyItems = settings.safetyItems || [];
-
-  const pd0=parseDate(dates[0]), pd1=parseDate(dates[dates.length-1]);
-  const periodLabel = isWeek
-    ? `${formatDate(dates[0])}〜${pd1.month}/${pd1.day}（${pd1.dow}）`
-    : (()=>{ const [y,m]=dates[0].split('-').map(Number); return `${y}年${m}月`; })();
-
-  const machines = [...new Set(Object.values(byDate).map(r=>r.machineName).filter(Boolean))];
-  const sites    = [...new Set(Object.values(byDate).map(r=>r.site).filter(Boolean))];
-
-  const thCols = dates.map(d => {
-    const pd=parseDate(d);
-    return isWeek ? `<th>${pd.month}/${pd.day}<br>${pd.dow}</th>` : `<th>${pd.day}</th>`;
-  }).join('');
-
-  function itemRows(items, checkKey) {
-    return items.map(name => {
-      const cells=dates.map(d=>{
-        const r=byDate[d]; if(!r) return '<td></td>';
-        const c=(r[checkKey]||[]).find(x=>x.name===name);
-        return `<td>${c?bpSym(c.status):''}</td>`;
-      }).join('');
-      return `<tr><td>${escHtml(name)}</td>${cells}</tr>`;
-    }).join('');
-  }
-
-  const inspRow = isWeek ? `
-    <tr>
-      <td style="font-weight:700">点検者</td>
-      ${dates.map(d=>`<td class="bp-insp">${byDate[d]?escHtml(byDate[d].inspector||''):'<span style="color:#ccc">—</span>'}</td>`).join('')}
-    </tr>` : '';
-
-  return `<div class="bp-wrap">
-    <div class="bp-head">
-      <div class="bp-logo">機械点検</div>
-      <div>
-        <div class="bp-htitle">機械点検簿　${isWeek?'週間集計':'月間集計'}</div>
-        <div class="bp-meta">
-          機械名：${escHtml(machine||machines.join('・')||'全機械')}
-          ${sites.length?'　現場：'+escHtml(sites.join('・')):''}
-          　期間：${periodLabel}
-        </div>
-      </div>
-    </div>
-
-    <div class="bp-stitle">🔩 本体・基本点検</div>
-    <table class="bp-tbl">
-      <thead><tr><th>点検項目</th>${thCols}</tr></thead>
-      <tbody>${itemRows(basicItems,'basicChecks')}</tbody>
-    </table>
-
-    <div class="bp-stitle">🛡️ 安全装置・作業装置点検</div>
-    <table class="bp-tbl">
-      <thead><tr><th>点検項目</th>${thCols}</tr></thead>
-      <tbody>${itemRows(safetyItems,'safetyChecks')}${inspRow}</tbody>
-    </table>
-
-    <div class="bp-sign">
-      <div class="bp-sign-box"><div class="bp-slbl">点検担当</div><div class="bp-sline">確認欄</div></div>
-      <div class="bp-sign-box"><div class="bp-slbl">確認者</div><div class="bp-sline">確認欄</div></div>
-      <div class="bp-sign-box"><div class="bp-slbl">現場責任者</div><div class="bp-sline">確認欄</div></div>
-    </div>
-  </div>`;
 }
 
 /* ============================================================

@@ -102,6 +102,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .list-filter{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .list-filter select,.list-filter input[type="month"]{flex:1;min-width:120px;border:2px solid var(--border);border-radius:10px;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--dark);background:#fff;outline:none;-webkit-appearance:none;}
 .list-filter select:focus,.list-filter input:focus{border-color:var(--orange);}
+.btn-batch{background:var(--dark);color:var(--yellow);border:none;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
+.btn-batch:active{opacity:0.8;}
 .list-summary{display:flex;gap:8px;margin-bottom:14px;}
 .summary-card{flex:1;background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.1);}
 .summary-card .s-num{font-size:24px;font-weight:900;color:var(--orange);line-height:1;}
@@ -160,38 +162,35 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.82);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:400;}
 .toast.show{opacity:1;}
 
+@page{size:A4;margin:10mm;}
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .header,.progress-bar,.progress-label,.card,.btn-submit,.btn-reset,#page-list,#page-settings,.toast{display:none!important;}
-  #preview-panel{display:block!important;box-shadow:none;padding:0;margin:0;border-radius:0;}
   body{background:#fff;}
-  .main{max-width:none!important;padding:0!important;margin:0!important;}
-  #page-form{display:block!important;padding:0!important;}
-  .print-page{width:210mm;min-height:297mm;margin:0 auto;padding:12mm 15mm 15mm;box-sizing:border-box;}
-  .print-header{display:flex!important;align-items:center;border-bottom:3px solid #1a1a1a;padding-bottom:10px;margin-bottom:14px;}
-  .print-logo{background:#1a1a1a;color:#FFD600;font-size:13px;font-weight:900;padding:4px 10px;border-radius:4px;margin-right:10px;}
-  .print-h-title{font-size:20px;font-weight:900;letter-spacing:0.08em;flex:1;}
-  .print-date-box{font-size:11px;color:#444;text-align:right;}
-  .print-section{margin-bottom:10px;}
-  .pst{background:#1a1a1a;color:#FFD600;font-size:11px;font-weight:900;padding:3px 8px;display:inline-block;letter-spacing:0.08em;margin-bottom:5px;border-radius:3px;}
-  .print-table{width:100%;border-collapse:collapse;font-size:12px;}
-  .print-table th{background:#f0f0f0;text-align:left;padding:5px 8px;font-weight:700;border:1px solid #ccc;width:28%;vertical-align:top;}
-  .print-table td{padding:5px 8px;border:1px solid #ccc;vertical-align:top;line-height:1.5;}
-  .p-chk-table{width:100%;border-collapse:collapse;font-size:11px;}
-  .p-chk-table th{background:#f0f0f0;padding:4px 6px;font-weight:700;border:1px solid #ccc;text-align:center;}
-  .p-chk-table th:first-child{text-align:left;width:50%;}
-  .p-chk-table td{padding:4px 5px;border:1px solid #ccc;text-align:center;vertical-align:middle;}
-  .p-chk-table td:first-child{text-align:left;line-height:1.4;}
-  .p-chk-table td.nc{font-size:10px;text-align:left;color:#555;}
-  .psok{color:#00A651;font-weight:900;font-size:13px;}
-  .pscau{color:#FF6B00;font-weight:900;font-size:13px;}
-  .psng{color:#D32F2F;font-weight:900;font-size:13px;}
-  .psna{color:#9E9E9E;font-weight:900;font-size:13px;}
-  .psnone{color:#bbb;}
-  .print-sign{display:flex!important;gap:16px;margin-top:12px;}
-  .print-sign-box{flex:1;border:1px solid #ccc;border-radius:4px;padding:10px;text-align:center;}
-  .psbl{font-size:10px;color:#666;margin-bottom:22px;}
-  .psll{border-top:1px solid #ccc;margin-top:8px;padding-top:4px;font-size:10px;color:#999;}
+  body.is-bulk-printing > *{display:none!important;}
+  body.is-bulk-printing > #bulkPrintContent{display:block!important;}
+  .print-page{width:100%;box-sizing:border-box;font-family:'Noto Sans JP',sans-serif;}
+  .print-header{display:flex;align-items:center;border-bottom:3px solid #1a1a1a;padding-bottom:7px;margin-bottom:9px;}
+  .print-logo{background:#1a1a1a;color:#FFD600;font-size:12px;font-weight:900;padding:3px 8px;border-radius:4px;margin-right:10px;}
+  .print-h-title{font-size:17px;font-weight:900;letter-spacing:0.08em;flex:1;}
+  .print-date-box{display:none!important;}
+  .preview-title{font-size:15px;font-weight:900;text-align:center;border-bottom:2px solid #1a1a1a;padding-bottom:7px;margin-bottom:9px;letter-spacing:0.1em;}
+  .preview-section{margin-bottom:7px;}
+  .preview-section h3{font-size:10px;font-weight:900;color:#FFD600;background:#1a1a1a;padding:2px 7px;border-radius:3px;display:inline-block;letter-spacing:0.08em;margin-bottom:4px;}
+  .pt{width:100%;border-collapse:collapse;font-size:10.5px;}
+  .pt th{background:#f0f0f0;text-align:left;padding:3px 6px;font-weight:700;border:1px solid #ccc;width:28%;vertical-align:top;}
+  .pt td{padding:3px 6px;border:1px solid #ccc;vertical-align:top;line-height:1.4;}
+  .pv-row{display:flex;justify-content:space-between;align-items:flex-start;padding:3px 0;border-bottom:1px solid #e0e0e0;gap:8px;font-size:10.5px;}
+  .pv-row:last-child{border-bottom:none;}
+  .pv-name{flex:1;}
+  .pv-note{font-size:9px;color:#666;margin-top:1px;}
+  .pv-st{font-weight:900;font-size:12px;flex-shrink:0;}
+  .pv-st.ok{color:#00A651;}
+  .pv-st.caution{color:#FF6B00;}
+  .pv-st.ng{color:#D32F2F;}
+  .pv-st.na{color:#9E9E9E;}
+  .pv-ampm{display:flex;align-items:center;gap:5px;margin-top:1px;}
+  .pv-albl{font-size:9px;font-weight:700;color:#666;}
+  .print-sign{display:none!important;}
 }
 </style>
 </head>
@@ -246,6 +245,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="bulkPrintContent" style="display:none"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -281,6 +281,7 @@ const DEF = {
 };
 
 let records, settings, draft, editId = null;
+let _filteredRecords = [];
 
 async function load() {
   // --- 設定の読み込み ---
@@ -548,9 +549,26 @@ function saveSettings() {
 }
 
 /* ---- PREVIEW & PRINT ---- */
+function buildFullPrintHTML(r) {
+  const header = `<div class="print-header"><div class="print-logo">現場点検</div><div class="print-h-title">現場点検簿</div></div>`;
+  return `<div class="print-page">${header}${genbaPreviewHTML(r)}</div>`;
+}
+
+function doPrint(htmlPages) {
+  el('bulkPrintContent').innerHTML = htmlPages;
+  el('bulkPrintContent').style.display = 'block';
+  document.body.classList.add('is-bulk-printing');
+  setTimeout(() => {
+    window.print();
+    document.body.classList.remove('is-bulk-printing');
+    el('bulkPrintContent').style.display = 'none';
+    el('bulkPrintContent').innerHTML = '';
+  }, 250);
+}
+
 function togglePreview() {
   const p = el('preview-panel');
-  if (p.style.display==='block') { p.style.display='none'; el('btnPreview').textContent='👁️ プレビュー・印刷'; }
+  if (p.style.display==='block') { doPrint(buildFullPrintHTML(draft)); }
   else { buildPreview(draft); p.style.display='block'; el('btnPreview').textContent='🖨️ 印刷する'; p.scrollIntoView({behavior:'smooth'}); }
 }
 
@@ -582,11 +600,6 @@ function genbaPreviewHTML(d) {
       <tr><th>総合評価・指示事項</th><td style="white-space:pre-wrap">${escHtml(d.summary||'（なし）')}</td></tr>
       <tr><th>確認者</th><td>${escHtml(d.confirmer||'')}</td></tr>
     </table></div>`;
-  h += `<div class="print-sign" style="display:none;">
-    <div class="print-sign-box"><div class="psbl">点検者</div><div class="psll">署名欄</div></div>
-    <div class="print-sign-box"><div class="psbl">確認者</div><div class="psll">署名欄</div></div>
-    <div class="print-sign-box"><div class="psbl">現場責任者</div><div class="psll">署名欄</div></div>
-  </div>`;
   return h;
 }
 
@@ -660,7 +673,8 @@ function renderList() {
       <option value="ng">不良あり</option>
       <option value="caution">要注意あり</option>
       <option value="ok">全項目良好</option>
-    </select>`;
+    </select>
+    <button class="btn-batch" onclick="printAllFiltered()">📄 一括印刷</button>`;
   setFilterMonth();
   const month  = el('filterMonth')  ? el('filterMonth').value  : '';
   const site   = el('filterSite')   ? el('filterSite').value   : '';
@@ -677,6 +691,7 @@ function renderList() {
     }
     return true;
   });
+  _filteredRecords = recs;
 
   const totalNg = recs.reduce((n,r)=>n+recordStatuses(r).filter(s=>s==='ng').length,0);
   el('listSummary').innerHTML = `
@@ -769,11 +784,19 @@ function detailAPChecks(title, checks) {
 }
 
 function printRecord(id) {
-  const r=records.find(r=>r.id===id); if(!r) return;
-  buildPreview(r);
-  el('preview-panel').style.display='block';
-  showPage('form');
-  setTimeout(()=>{ window.print(); el('preview-panel').style.display='none'; showPage('list'); },200);
+  const r = records.find(r => r.id === id); if (!r) return;
+  doPrint(buildFullPrintHTML(r));
+}
+
+function printAllFiltered() {
+  if (!_filteredRecords.length) { showToast('印刷する記録がありません'); return; }
+  const html = _filteredRecords.map((r, i) => {
+    const page = buildFullPrintHTML(r);
+    return i < _filteredRecords.length - 1
+      ? page.replace('<div class="print-page">', '<div class="print-page" style="page-break-after:always">')
+      : page;
+  }).join('');
+  doPrint(html);
 }
 
 function editRecord(id) {

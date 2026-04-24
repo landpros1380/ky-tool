@@ -185,9 +185,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .settings-item-list{margin-bottom:12px;}
 .settings-item{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border-radius:10px;margin-bottom:6px;}
 .settings-item span{flex:1;font-size:15px;color:var(--dark);}
-.settings-item .item-order{display:flex;gap:4px;}
-.btn-item-up,.btn-item-down{background:#fff;border:2px solid var(--border);border-radius:6px;width:28px;height:28px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:var(--sub);}
+.settings-item .item-order{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
+.btn-item-up,.btn-item-down{background:#fff;border:1px solid #ddd;border-radius:4px;width:24px;height:20px;font-size:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:#888;line-height:1;}
 .btn-item-up:active,.btn-item-down:active{background:#f0f0f0;}
+.btn-item-up:disabled,.btn-item-down:disabled{opacity:0.2;cursor:default;}
 .btn-item-del{background:transparent;border:2px solid #ffcdd2;border-radius:6px;width:28px;height:28px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:var(--red);}
 .btn-item-del:active{background:#ffebee;}
 .settings-add-row{display:flex;gap:8px;}
@@ -835,7 +836,7 @@ function renderSiteSettings(){
   const list=document.getElementById('siteList'); if(!list) return; list.innerHTML='';
   sites.forEach((s,i)=>{
     const row=document.createElement('div'); row.className='settings-item';
-    row.innerHTML=`<span>${s}</span><div class="item-order"><button class="btn-item-up" onclick="moveSite(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn-item-down" onclick="moveSite(${i},1)" ${i===sites.length-1?'disabled':''}>↓</button></div><button class="btn-item-del" onclick="delSite(${i})">✕</button>`;
+    row.innerHTML=`<div class="item-order"><button class="btn-item-up" onclick="moveSite(${i},-1)" ${i===0?'disabled':''}>▲</button><button class="btn-item-down" onclick="moveSite(${i},1)" ${i===sites.length-1?'disabled':''}>▼</button></div><span>${s}</span><button class="btn-item-del" onclick="delSite(${i})">×</button>`;
     list.appendChild(row);
   });
 }
@@ -862,7 +863,7 @@ function renderWorkTypeSettings(){
   const list=document.getElementById('workTypeList'); list.innerHTML='';
   workTypes.forEach((t,i)=>{
     const row=document.createElement('div'); row.className='settings-item';
-    row.innerHTML=`<span>${t}</span><div class="item-order"><button class="btn-item-up" onclick="moveWorkType(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn-item-down" onclick="moveWorkType(${i},1)" ${i===workTypes.length-1?'disabled':''}>↓</button></div><button class="btn-item-del" onclick="delWorkType(${i})">✕</button>`;
+    row.innerHTML=`<div class="item-order"><button class="btn-item-up" onclick="moveWorkType(${i},-1)" ${i===0?'disabled':''}>▲</button><button class="btn-item-down" onclick="moveWorkType(${i},1)" ${i===workTypes.length-1?'disabled':''}>▼</button></div><span>${t}</span><button class="btn-item-del" onclick="delWorkType(${i})">×</button>`;
     list.appendChild(row);
   });
 }
@@ -894,7 +895,7 @@ function renderEquipSettings(){
   const list=document.getElementById('equipList'); list.innerHTML='';
   equips.forEach((e,i)=>{
     const row=document.createElement('div'); row.className='settings-item';
-    row.innerHTML=`<span>${e}</span><div class="item-order"><button class="btn-item-up" onclick="moveEquip(${i},-1)" ${i===0?'disabled':''}>↑</button><button class="btn-item-down" onclick="moveEquip(${i},1)" ${i===equips.length-1?'disabled':''}>↓</button></div><button class="btn-item-del" onclick="delEquip(${i})">✕</button>`;
+    row.innerHTML=`<div class="item-order"><button class="btn-item-up" onclick="moveEquip(${i},-1)" ${i===0?'disabled':''}>▲</button><button class="btn-item-down" onclick="moveEquip(${i},1)" ${i===equips.length-1?'disabled':''}>▼</button></div><span>${e}</span><button class="btn-item-del" onclick="delEquip(${i})">×</button>`;
     list.appendChild(row);
   });
 }

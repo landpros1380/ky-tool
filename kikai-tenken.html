@@ -156,6 +156,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .si-list{margin-bottom:12px;}
 .si-item{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border-radius:10px;margin-bottom:6px;}
 .si-item span{flex:1;font-size:15px;color:var(--dark);}
+.si-reorder{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
+.btn-si-mv{background:#fff;border:1px solid #ddd;border-radius:4px;width:24px;height:20px;font-size:10px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:#888;line-height:1;}
+.btn-si-mv:active{background:#f0f0f0;}
+.btn-si-mv:disabled{opacity:0.2;cursor:default;}
 .btn-si-del{background:transparent;border:2px solid #ffcdd2;border-radius:6px;width:28px;height:28px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;padding:0;color:var(--red);}
 .btn-si-del:active{background:#ffebee;}
 .sa-row{display:flex;gap:8px;}
@@ -889,9 +893,26 @@ function ssec(icon, title, key, inputId, ph, isCheck) {
 
 function renderSList(key) {
   const c=el('sl_'+key); if(!c) return;
-  c.innerHTML=(settings[key]||[]).map((item,i)=>
-    `<div class="si-item"><span>${escHtml(item)}</span><button class="btn-si-del" onclick="sDel('${key}',${i})">×</button></div>`
+  const items=settings[key]||[];
+  c.innerHTML=items.map((item,i)=>
+    `<div class="si-item">
+      <div class="si-reorder">
+        <button class="btn-si-mv" onclick="sMove('${key}',${i},-1)"${i===0?' disabled':''}>▲</button>
+        <button class="btn-si-mv" onclick="sMove('${key}',${i},1)"${i===items.length-1?' disabled':''}>▼</button>
+      </div>
+      <span>${escHtml(item)}</span>
+      <button class="btn-si-del" onclick="sDel('${key}',${i})">×</button>
+    </div>`
   ).join('')||'<div style="color:var(--sub);font-size:13px;padding:8px 0">項目がありません</div>';
+}
+
+function sMove(key, idx, dir) {
+  const arr=settings[key]||[];
+  const ni=idx+dir;
+  if(ni<0||ni>=arr.length) return;
+  [arr[idx],arr[ni]]=[arr[ni],arr[idx]];
+  saveSettings(); renderSList(key);
+  syncChecks(draft); renderFormCards();
 }
 
 function sAdd(key, inputId, isCheck) {

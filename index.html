@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>安全管理ツールキット</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+:root{--yellow:#FFD600;--dark:#1a1a1a;--orange:#FF6B00;--border:#e0e0e0;--sub:#666;--green:#00A651;--red:#D32F2F;--bg:#f7f7f7;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100vh;color:var(--dark);}
+
+/* HEADER */
+.header{background:var(--yellow);padding:12px 16px 10px;border-bottom:4px solid var(--orange);display:flex;align-items:center;gap:10px;}
+.header-icon{width:36px;height:36px;background:var(--dark);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.header-titles h1{font-size:17px;font-weight:900;color:var(--dark);letter-spacing:0.04em;line-height:1.2;}
+.header-titles p{font-size:10px;color:#555;font-weight:500;}
+
+/* HERO */
+.hero{background:var(--dark);padding:32px 16px 24px;text-align:center;}
+.hero-logo{width:72px;height:72px;background:var(--yellow);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px;box-shadow:0 6px 24px rgba(255,214,0,.3);}
+.hero-title{font-size:26px;font-weight:900;color:#fff;letter-spacing:0.06em;margin-bottom:6px;}
+.hero-sub{font-size:13px;color:#888;line-height:1.6;max-width:340px;margin:0 auto;}
+
+/* CARDS SECTION */
+.section{padding:20px 16px 24px;max-width:600px;margin:0 auto;}
+.section-title{font-size:11px;font-weight:700;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;padding-left:2px;}
+
+/* TOOL CARD */
+.tool-card{background:#fff;border-radius:20px;margin-bottom:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.35);cursor:pointer;display:block;text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent;transition:transform 0.15s;}
+.tool-card:active{transform:scale(0.97);}
+.tool-card-inner{display:flex;align-items:center;gap:16px;padding:20px 18px;}
+.tool-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.tool-icon.ky{background:#FFF8E1;}
+.tool-icon.genba{background:#E3F2FD;}
+.tool-icon.kikai{background:#E8F5E9;}
+.tool-body{flex:1;min-width:0;}
+.tool-name{font-size:19px;font-weight:900;color:var(--dark);letter-spacing:0.02em;}
+.tool-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5;}
+.tool-badge{font-size:10px;font-weight:700;background:var(--bg);color:var(--sub);padding:3px 10px;border-radius:10px;margin-top:6px;display:inline-block;}
+.tool-badge.active{background:#E8F5E9;color:var(--green);}
+.tool-arrow{font-size:20px;color:#ccc;flex-shrink:0;}
+
+/* CHECKLIST SECTION */
+.tool-card-footer{background:var(--bg);border-top:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:10px;}
+.footer-stat{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;}
+.footer-dot{width:8px;height:8px;border-radius:50%;}
+.footer-dot.green{background:var(--green);}
+.footer-dot.orange{background:var(--orange);}
+.footer-dot.red{background:var(--red);}
+.footer-sep{flex:1;}
+.footer-count{font-size:11px;color:#aaa;font-weight:700;}
+
+/* GUIDE SECTION */
+.guide-card{background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.guide-header{background:var(--dark);padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.guide-header .g-icon{font-size:17px;}
+.guide-header h2{font-size:13px;font-weight:900;color:var(--yellow);letter-spacing:0.05em;}
+.guide-body{padding:16px;}
+.guide-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.guide-step:last-child{margin-bottom:0;}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--yellow);color:var(--dark);font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:13px;color:var(--dark);line-height:1.6;}
+.step-text strong{font-weight:700;color:var(--orange);}
+
+/* FOOTER */
+.app-footer{padding:24px 16px;text-align:center;}
+.app-footer p{font-size:11px;color:#555;line-height:1.8;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.82);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:400;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🛡️</div>
+  <div class="header-titles">
+    <h1>安全管理ツールキット</h1>
+    <p>建設現場の安全活動をサポート</p>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-logo">🛡️</div>
+  <div class="hero-title">安全管理ツールキット</div>
+  <div class="hero-sub">KY活動・現場点検・機械点検を一元管理。毎日の安全確認をスマートに。</div>
+</div>
+
+<div class="section">
+  <div class="section-title">ツールを選択</div>
+
+  <!-- KY活動記録 -->
+  <a class="tool-card" href="ky-tool.html">
+    <div class="tool-card-inner">
+      <div class="tool-icon ky">⚠️</div>
+      <div class="tool-body">
+        <div class="tool-name">KY活動記録</div>
+        <div class="tool-desc">危険予知・安全確認ツール。リスクアセスメントと作業前の安全確認を記録します。</div>
+        <div class="tool-badge" id="kyBadge">記録を確認中...</div>
+      </div>
+      <div class="tool-arrow">▶</div>
+    </div>
+    <div class="tool-card-footer" id="kyFooter" style="display:none">
+      <span class="footer-stat"><span class="footer-dot green"></span><span id="kyStatOk">0</span>件 良好</span>
+      <span class="footer-stat"><span class="footer-dot orange"></span><span id="kyStatMid">0</span>件 中リスク</span>
+      <span class="footer-stat"><span class="footer-dot red"></span><span id="kyStatHigh">0</span>件 高リスク</span>
+      <span class="footer-sep"></span>
+      <span class="footer-count">直近7日</span>
+    </div>
+  </a>
+
+  <!-- 現場点検簿 -->
+  <a class="tool-card" href="genba-tenken.html">
+    <div class="tool-card-inner">
+      <div class="tool-icon genba">🏗️</div>
+      <div class="tool-body">
+        <div class="tool-name">現場点検簿</div>
+        <div class="tool-desc">安全設備・作業環境の点検ツール。午前・午後の2回点検に対応します。</div>
+        <div class="tool-badge" id="genbaBadge">記録を確認中...</div>
+      </div>
+      <div class="tool-arrow">▶</div>
+    </div>
+    <div class="tool-card-footer" id="genbaFooter" style="display:none">
+      <span class="footer-stat"><span class="footer-dot green"></span><span id="genbaStatOk">0</span>件 問題なし</span>
+      <span class="footer-stat"><span class="footer-dot orange"></span><span id="genbaStatCau">0</span>件 要注意</span>
+      <span class="footer-stat"><span class="footer-dot red"></span><span id="genbaStatNg">0</span>件 不良</span>
+      <span class="footer-sep"></span>
+      <span class="footer-count">直近7日</span>
+    </div>
+  </a>
+
+  <!-- 機械点検簿 -->
+  <a class="tool-card" href="kikai-tenken.html">
+    <div class="tool-card-inner">
+      <div class="tool-icon kikai">⚙️</div>
+      <div class="tool-body">
+        <div class="tool-name">機械点検簿</div>
+        <div class="tool-desc">建設機械・設備の日常点検ツール。機種ごとに点検結果を管理します。</div>
+        <div class="tool-badge" id="kikaiHBadge">記録を確認中...</div>
+      </div>
+      <div class="tool-arrow">▶</div>
+    </div>
+    <div class="tool-card-footer" id="kikaiFooter" style="display:none">
+      <span class="footer-stat"><span class="footer-dot green"></span><span id="kikaiStatOk">0</span>件 問題なし</span>
+      <span class="footer-stat"><span class="footer-dot orange"></span><span id="kikaiStatCau">0</span>件 要注意</span>
+      <span class="footer-stat"><span class="footer-dot red"></span><span id="kikaiStatNg">0</span>件 不良</span>
+      <span class="footer-sep"></span>
+      <span class="footer-count">直近7日</span>
+    </div>
+  </a>
+
+</div>
+
+<div class="section" style="padding-top:0">
+  <div class="section-title">使い方ガイド</div>
+  <div class="guide-card">
+    <div class="guide-header">
+      <span class="g-icon">📖</span>
+      <h2>毎日の安全活動フロー</h2>
+    </div>
+    <div class="guide-body">
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>作業開始前（朝礼時）</strong><br>「KY活動記録」で危険予知・リスクアセスメントを実施し、作業者全員で確認します。</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>午前の点検</strong><br>「現場点検簿」で安全設備・作業環境を確認。「機械点検簿」で使用機械の日常点検を行います。</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>午後の点検</strong><br>「現場点検簿」で午後の点検を追記。変化があった箇所を記録します。</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>記録の保存・提出</strong><br>各ツールの「プレビュー・印刷」からPDFや印刷用の書類を出力できます。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide-card">
+    <div class="guide-header">
+      <span class="g-icon">💡</span>
+      <h2>各ツールの特徴</h2>
+    </div>
+    <div class="guide-body">
+      <div class="guide-step">
+        <div class="step-num" style="background:#FFF8E1">⚠️</div>
+        <div class="step-text"><strong>KY活動記録</strong><br>危険源の特定・リスクレベル評価・対策の記録。作業者の健康状態確認、PPE（保護具）の確認も含みます。</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num" style="background:#E3F2FD">🏗️</div>
+        <div class="step-text"><strong>現場点検簿</strong><br>足場・養生・立入禁止区画など安全設備と作業環境を午前・午後で点検。良好/要注意/不良で記録します。</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num" style="background:#E8F5E9">⚙️</div>
+        <div class="step-text"><strong>機械点検簿</strong><br>建設機械の外観・油脂類・安全装置などを日常点検。機種・管理番号・時間計も記録します。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app-footer">
+  <p>安全管理ツールキット<br>データはこの端末のみに保存されます（クラウド送信なし）</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* 各ツールの記録数をlocalStorageから読み込んで表示 */
+function loadStats() {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now - 7*24*60*60*1000);
+
+  function countRecent(key) {
+    try {
+      const recs = JSON.parse(localStorage.getItem(key)) || [];
+      return recs.filter(r => {
+        if (!r.date) return false;
+        return new Date(r.date + 'T00:00:00') >= sevenDaysAgo;
+      });
+    } catch(e) { return []; }
+  }
+
+  // KY Records
+  const kyRecs = countRecent('ky_records');
+  const kyBadge = document.getElementById('kyBadge');
+  if (kyRecs.length > 0) {
+    kyBadge.textContent = `📊 ${kyRecs.length}件の記録（直近7日）`;
+    kyBadge.className = 'tool-badge active';
+    let ok=0, mid=0, high=0;
+    kyRecs.forEach(r => {
+      (r.risks||[]).forEach(ri => {
+        if (ri.level==='high') high++;
+        else if (ri.level==='mid') mid++;
+        else ok++;
+      });
+    });
+    document.getElementById('kyStatOk').textContent = ok;
+    document.getElementById('kyStatMid').textContent = mid;
+    document.getElementById('kyStatHigh').textContent = high;
+    document.getElementById('kyFooter').style.display = 'flex';
+  } else {
+    kyBadge.textContent = '記録なし';
+    kyBadge.className = 'tool-badge';
+  }
+
+  // Genba Records (standalone)
+  const genbaRecs = countRecent('genba_records');
+  const genbaBadge = document.getElementById('genbaBadge');
+  if (genbaRecs.length > 0) {
+    genbaBadge.textContent = `📊 ${genbaRecs.length}件の記録（直近7日）`;
+    genbaBadge.className = 'tool-badge active';
+    let ok=0, cau=0, ng=0;
+    genbaRecs.forEach(r => {
+      [...(r.safetyChecks||[]), ...(r.envChecks||[])].forEach(c => {
+        const w = worstOf(c.amStatus, c.pmStatus);
+        if (w==='ng') ng++;
+        else if (w==='caution') cau++;
+        else if (w) ok++;
+      });
+    });
+    document.getElementById('genbaStatOk').textContent = ok;
+    document.getElementById('genbaStatCau').textContent = cau;
+    document.getElementById('genbaStatNg').textContent = ng;
+    document.getElementById('genbaFooter').style.display = 'flex';
+  } else {
+    genbaBadge.textContent = '記録なし';
+    genbaBadge.className = 'tool-badge';
+  }
+
+  // Kikai Records (standalone)
+  const kikaiRecs = countRecent('kikai_records');
+  const kikaiBadge = document.getElementById('kikaiHBadge');
+  if (kikaiRecs.length > 0) {
+    kikaiBadge.textContent = `📊 ${kikaiRecs.length}件の記録（直近7日）`;
+    kikaiBadge.className = 'tool-badge active';
+    let ok=0, cau=0, ng=0;
+    kikaiRecs.forEach(r => {
+      [...(r.basicChecks||[]), ...(r.safetyChecks||[])].forEach(c => {
+        if (c.status==='ng') ng++;
+        else if (c.status==='caution') cau++;
+        else if (c.status) ok++;
+      });
+    });
+    document.getElementById('kikaiStatOk').textContent = ok;
+    document.getElementById('kikaiStatCau').textContent = cau;
+    document.getElementById('kikaiStatNg').textContent = ng;
+    document.getElementById('kikaiFooter').style.display = 'flex';
+  } else {
+    kikaiBadge.textContent = '記録なし';
+    kikaiBadge.className = 'tool-badge';
+  }
+}
+
+function worstOf(a, b) {
+  const s = [a,b].filter(Boolean);
+  if (s.includes('ng'))      return 'ng';
+  if (s.includes('caution')) return 'caution';
+  if (s.includes('ok'))      return 'ok';
+  if (s.includes('na'))      return 'na';
+  return null;
+}
+
+document.addEventListener('DOMContentLoaded', loadStats);
+</script>
+</body>
+</html>

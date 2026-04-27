@@ -291,7 +291,8 @@ const DEF_SETTINGS = {
   machines: ['バックホウ（0.45m³）','バックホウ（0.7m³）','クローラークレーン','ホイールローダー','振動ローラー','高所作業車','フォークリフト'],
   inspectors: ['山田太郎','鈴木一郎','田中花子'],
   basicItems: ['ボディ・フレームの損傷確認','油漏れ（エンジン・油圧・変速機）','水漏れ（冷却水・ラジエーター）','タイヤ・クローラの摩耗・損傷','エンジンオイル量','冷却水量','燃料残量','作動油量','エアクリーナーの汚れ','バッテリー液量・端子'],
-  safetyItems: ['ブレーキ（走行・駐車）の効き','警報装置・ホーンの動作','バックアラームの動作','照明・作業灯の点灯','安全ガード・カバーの取付','非常停止装置の動作','ブーム・アームの損傷・亀裂','バケット・アタッチメントの状態','油圧ホース・フィッティングの状態','ワイヤー・チェーン（クレーン）の状態']
+  safetyItems: ['ブレーキ（走行・駐車）の効き','警報装置・ホーンの動作','バックアラームの動作','照明・作業灯の点灯','安全ガード・カバーの取付','非常停止装置の動作','ブーム・アームの損傷・亀裂','バケット・アタッチメントの状態','油圧ホース・フィッティングの状態','ワイヤー・チェーン（クレーン）の状態'],
+  machineItems: {}
 };
 
 /* ============================================================
@@ -299,6 +300,7 @@ const DEF_SETTINGS = {
    ============================================================ */
 let records, settings, draft, editId = null;
 let _filteredRecords = [];
+let _settingMachine = '';
 
 async function load() {
   // --- 設定の読み込み ---
@@ -357,9 +359,17 @@ function newDraft() {
 }
 const mkSingle = n => ({name: n, status: null, note: ''});
 
+function getMachineItems(machineName) {
+  if (machineName && settings.machineItems && settings.machineItems[machineName]) {
+    return settings.machineItems[machineName];
+  }
+  return { basicItems: settings.basicItems || [], safetyItems: settings.safetyItems || [] };
+}
+
 function syncChecks(d) {
-  d.basicChecks  = mergeSingle(d.basicChecks,  settings.basicItems);
-  d.safetyChecks = mergeSingle(d.safetyChecks, settings.safetyItems);
+  const items = getMachineItems(d.machineName);
+  d.basicChecks  = mergeSingle(d.basicChecks,  items.basicItems);
+  d.safetyChecks = mergeSingle(d.safetyChecks, items.safetyItems);
 }
 
 function mergeSingle(existing, items) {
@@ -402,8 +412,8 @@ function renderFormCards() {
     <div class="field"><label>現場名<span class="req">*</span></label>
       <select id="siteName" onchange="onSel('siteName','siteAddRow','siteInput')">${optsAdd(s.sites,d.site,'新規現場を追加...')}</select>
       <div class="add-row" id="siteAddRow"><input type="text" id="siteInput" placeholder="現場名を入力"><button class="btn-inline-add" onclick="addSite()">+</button></div></div>
-    <div class="field"><label>機械名・機種<span class="req">*</span></label>
-      <select id="machineName" onchange="onSel('machineName','machineAddRow','machineInput')">${optsAdd(s.machines,d.machineName,'新規機械を追加...')}</select>
+    <div class="field"><label>機械名・点検内容<span class="req">*</span></label>
+      <select id="machineName" onchange="onMachineSel()">${optsAdd(s.machines,d.machineName,'新規機械を追加...')}</select>
       <div class="add-row" id="machineAddRow"><input type="text" id="machineInput" placeholder="機械名を入力"><button class="btn-inline-add" onclick="addMachine()">+</button></div></div>
     <div class="field"><label>機械番号・管理番号</label>
       <input type="text" id="machineNo" value="${escAttr(d.machineNo||'')}" placeholder="例：PC-001" oninput="saveDraft()"></div>
@@ -550,6 +560,20 @@ function onSel(selId, rowId, inputId) {
   else { saveDraft(); updateProgress(); }
 }
 
+function onMachineSel() {
+  const sel = el('machineName');
+  if (sel.value === '__new__') {
+    sel.value = '';
+    el('machineAddRow').style.display = 'flex';
+    el('machineInput').focus();
+  } else {
+    saveDraft();
+    syncChecks(draft);
+    renderFormCards();
+    updateProgress();
+  }
+}
+
 function addSite() { addToList('sites','siteInput','siteName','siteAddRow','新規現場を追加...'); }
 function addMachine() { addToList('machines','machineInput','machineName','machineAddRow','新規機械を追加...'); }
 function addInspector() {
@@ -620,7 +644,7 @@ function previewHTML(d) {
     <table class="pt">
       <tr><th>点検日</th><td>${d.date?formatDate(d.date):''}</td></tr>
       <tr><th>現場名</th><td>${escHtml(d.site||'')}</td></tr>
-      <tr><th>機械名・機種</th><td>${escHtml(d.machineName||'')}</td></tr>
+      <tr><th>機械名・点検内容</th><td>${escHtml(d.machineName||'')}</td></tr>
       <tr><th>機械番号</th><td>${escHtml(d.machineNo||'')}</td></tr>
       <tr><th>点検者</th><td>${escHtml(d.inspector||'')}</td></tr>
       <tr><th>運転者</th><td>${escHtml(d.operator||'')}</td></tr>
@@ -871,14 +895,18 @@ function renderSettings() {
       </div>
     </div></div>`;
   h+=ssec('🏗️','現場名','sites','newSiteInput','現場名を追加');
-  h+=ssec('🚜','機械名・機種','machines','newMachineInput','機械名を追加');
+  h+=ssec('🚜','機械名・点検内容','machines','newMachineInput','機械名を追加');
   h+=ssec('👷','点検者・オペレーター','inspectors','newInspInput','氏名を追加');
-  h+=ssec('🔩','本体・基本点検項目','basicItems','newBasicInput','点検項目を追加',true);
-  h+=ssec('🛡️','安全装置・作業装置点検項目','safetyItems','newSafetyInput','点検項目を追加',true);
+  h+=ssec('🔩','デフォルト・基本点検項目','basicItems','newBasicInput','点検項目を追加',true);
+  h+=ssec('🛡️','デフォルト・安全装置点検項目','safetyItems','newSafetyInput','点検項目を追加',true);
+  h+=renderMachineItemsSection();
   h+=`<div class="ss"><div class="ss-head"><span class="si">⚠️</span><h2>データ管理</h2></div>
     <div class="ss-body"><button class="settings-reset-btn" onclick="resetAllData()">🗑️ すべてのデータを削除する</button></div></div>`;
   el('settingsContainer').innerHTML=h;
   ['sites','machines','inspectors','basicItems','safetyItems'].forEach(renderSList);
+  if (_settingMachine && settings.machineItems && settings.machineItems[_settingMachine]) {
+    renderMIList('basic'); renderMIList('safety');
+  }
 }
 
 function ssec(icon, title, key, inputId, ph, isCheck) {
@@ -925,7 +953,130 @@ function sAdd(key, inputId, isCheck) {
 }
 
 function sDel(key, idx) {
+  if (key === 'machines') {
+    const name = settings.machines[idx];
+    if (settings.machineItems && settings.machineItems[name]) delete settings.machineItems[name];
+    if (_settingMachine === name) _settingMachine = '';
+  }
   settings[key].splice(idx,1); saveSettings(); renderSList(key);
+  syncChecks(draft); renderFormCards();
+}
+
+/* ============================================================
+   機械別点検項目
+   ============================================================ */
+function renderMachineItemsSection() {
+  const machines = settings.machines || [];
+  const machineOpts = machines.map(m =>
+    `<option value="${escAttr(m)}"${m===_settingMachine?' selected':''}>${escHtml(m)}</option>`
+  ).join('');
+  let inner = '';
+  if (_settingMachine) {
+    const hasCustom = settings.machineItems && settings.machineItems[_settingMachine];
+    if (hasCustom) {
+      inner = `
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+          <button onclick="resetMachineItems()" style="background:transparent;border:2px solid #ffcdd2;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--red);cursor:pointer;font-family:inherit;">デフォルトに戻す</button>
+        </div>
+        <p style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;letter-spacing:0.05em;">🔩 本体・基本点検項目</p>
+        <div class="si-list" id="sl_mi_basic"></div>
+        <div class="sa-row" style="margin-bottom:16px;"><input type="text" id="newMIBasicInput" placeholder="点検項目を追加">
+          <button class="btn-sa" onclick="addMachineItem('basic')">+</button></div>
+        <p style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px;letter-spacing:0.05em;">🛡️ 安全装置・作業装置点検項目</p>
+        <div class="si-list" id="sl_mi_safety"></div>
+        <div class="sa-row"><input type="text" id="newMISafetyInput" placeholder="点検項目を追加">
+          <button class="btn-sa" onclick="addMachineItem('safety')">+</button></div>
+        <p class="settings-hint">項目の変更は新規点検フォームに反映されます。過去の記録には影響しません。</p>`;
+    } else {
+      inner = `
+        <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#555;line-height:1.8;">
+          現在は<b>デフォルト点検項目</b>を使用中です。<br>
+          下のボタンで、この機械専用の項目を設定できます。
+        </div>
+        <button class="btn-sa" style="width:100%;justify-content:center;" onclick="customizeMachineItems()">＋ この機械専用の点検項目を設定する</button>`;
+    }
+  }
+  return `<div class="ss"><div class="ss-head"><span class="si">🔧</span><h2>機械別点検項目</h2></div>
+    <div class="ss-body">
+      <p class="settings-hint" style="margin-bottom:12px;">機械ごとに専用の点検項目を設定できます。未設定の機械はデフォルト項目を使用します。</p>
+      <div class="field" style="margin-top:0;margin-bottom:${_settingMachine?'16':'0'}px;">
+        <label>機械を選択</label>
+        <select onchange="onSettingsMachineChange(this.value)">
+          <option value="">-- 機械を選択 --</option>${machineOpts}
+        </select>
+      </div>
+      ${inner}
+    </div></div>`;
+}
+
+function onSettingsMachineChange(val) {
+  _settingMachine = val; renderSettings();
+}
+
+function customizeMachineItems() {
+  if (!settings.machineItems) settings.machineItems = {};
+  const base = getMachineItems(_settingMachine);
+  settings.machineItems[_settingMachine] = {
+    basicItems:  [...base.basicItems],
+    safetyItems: [...base.safetyItems]
+  };
+  saveSettings(); renderSettings();
+  renderMIList('basic'); renderMIList('safety');
+  showToast('専用項目を設定しました');
+}
+
+function resetMachineItems() {
+  if (!confirm(`「${_settingMachine}」の専用設定を削除してデフォルトに戻しますか？`)) return;
+  if (settings.machineItems) delete settings.machineItems[_settingMachine];
+  saveSettings(); syncChecks(draft); renderFormCards(); renderSettings();
+  showToast('デフォルトに戻しました');
+}
+
+function renderMIList(type) {
+  const c = el('sl_mi_'+type); if (!c) return;
+  const mi = settings.machineItems && settings.machineItems[_settingMachine];
+  if (!mi) return;
+  const key = type==='basic' ? 'basicItems' : 'safetyItems';
+  const items = mi[key] || [];
+  c.innerHTML = items.map((item,i) =>
+    `<div class="si-item">
+      <div class="si-reorder">
+        <button class="btn-si-mv" onclick="moveMachineItem('${type}',${i},-1)"${i===0?' disabled':''}>▲</button>
+        <button class="btn-si-mv" onclick="moveMachineItem('${type}',${i},1)"${i===items.length-1?' disabled':''}>▼</button>
+      </div>
+      <span>${escHtml(item)}</span>
+      <button class="btn-si-del" onclick="delMachineItem('${type}',${i})">×</button>
+    </div>`
+  ).join('') || '<div style="color:var(--sub);font-size:13px;padding:8px 0">項目がありません</div>';
+}
+
+function addMachineItem(type) {
+  const inputId = type==='basic' ? 'newMIBasicInput' : 'newMISafetyInput';
+  const key = type==='basic' ? 'basicItems' : 'safetyItems';
+  const val = el(inputId).value.trim(); if (!val) return;
+  const mi = settings.machineItems[_settingMachine];
+  if ((mi[key]||[]).includes(val)) { showToast('すでに登録されています'); return; }
+  (mi[key] = mi[key]||[]).push(val);
+  el(inputId).value = '';
+  saveSettings(); renderMIList(type);
+  syncChecks(draft); renderFormCards();
+  showToast('追加しました');
+}
+
+function delMachineItem(type, idx) {
+  const key = type==='basic' ? 'basicItems' : 'safetyItems';
+  settings.machineItems[_settingMachine][key].splice(idx,1);
+  saveSettings(); renderMIList(type);
+  syncChecks(draft); renderFormCards();
+}
+
+function moveMachineItem(type, idx, dir) {
+  const key = type==='basic' ? 'basicItems' : 'safetyItems';
+  const arr = settings.machineItems[_settingMachine][key];
+  const ni = idx+dir;
+  if (ni<0||ni>=arr.length) return;
+  [arr[idx],arr[ni]] = [arr[ni],arr[idx]];
+  saveSettings(); renderMIList(type);
   syncChecks(draft); renderFormCards();
 }
 

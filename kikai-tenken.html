@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>機械点検簿</title>
+<title>機械等点検簿</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 :root{--yellow:#FFD600;--dark:#1a1a1a;--orange:#FF6B00;--border:#e0e0e0;--sub:#666;--green:#00A651;--red:#D32F2F;--bg:#f7f7f7;--gray:#9E9E9E;}
@@ -212,7 +212,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 <div class="header">
   <a class="btn-home" href="index.html">🏠</a>
   <div class="header-icon">⚙️</div>
-  <div class="header-titles"><h1>機械点検簿</h1><p>建設機械・設備の日常点検</p></div>
+  <div class="header-titles"><h1>機械等点検簿</h1><p>建設機械・設備の日常点検</p></div>
   <div class="header-actions">
     <button class="btn-hdr active-tab" id="tab-form-btn" onclick="showPage('form')">✏️ 入力</button>
     <button class="btn-hdr" id="tab-list-btn" onclick="showPage('list')">📋 一覧</button>
@@ -223,16 +223,16 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 <div class="page active" id="page-form">
   <div class="main">
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="progress-label" id="progressLabel">0 / 4 セクション完了</div>
+    <div class="progress-label" id="progressLabel">0 / 3 セクション完了</div>
     <div id="formCards"></div>
     <div id="preview-panel">
       <div class="print-page">
         <div class="print-header" style="display:none;">
-          <div class="print-logo">機械点検</div>
-          <div class="print-h-title">機械点検簿</div>
+          <div class="print-logo">機械等点検</div>
+          <div class="print-h-title">機械等点検簿</div>
           <div class="print-date-box" id="printDateBox"></div>
         </div>
-        <div class="preview-title">機械点検簿</div>
+        <div class="preview-title">機械等点検簿</div>
         <div id="previewContent"></div>
       </div>
     </div>
@@ -425,23 +425,17 @@ function renderFormCards() {
   </div></div>
   <div class="card"><div class="card-header" onclick="toggleCard(2)">
     <div class="card-num" id="num2">2</div>
-    <div><div class="card-title">🔩 本体・基本点検</div><div class="card-subtitle">外観・油脂類・燃料等</div></div>
+    <div><div class="card-title">✅ 点検内容</div><div class="card-subtitle">本体・安全装置・作業装置等</div></div>
     <div class="card-chevron" id="chev2">▶</div>
   </div><div class="card-body" id="body2">
     <div class="check-list" id="basicCheckList"></div><div class="chk-footer" id="basicFooter"></div>
+    <div class="check-list" id="safetyCheckList"></div><div class="chk-footer" id="safetyFooter"></div>
   </div></div>
   <div class="card"><div class="card-header" onclick="toggleCard(3)">
     <div class="card-num" id="num3">3</div>
-    <div><div class="card-title">🛡️ 安全装置・作業装置点検</div><div class="card-subtitle">ブレーキ・警報・アタッチメント等</div></div>
+    <div><div class="card-title">📝 特記事項・処置内容</div><div class="card-subtitle">不良箇所・処置・確認者</div></div>
     <div class="card-chevron" id="chev3">▶</div>
   </div><div class="card-body" id="body3">
-    <div class="check-list" id="safetyCheckList"></div><div class="chk-footer" id="safetyFooter"></div>
-  </div></div>
-  <div class="card"><div class="card-header" onclick="toggleCard(4)">
-    <div class="card-num" id="num4">4</div>
-    <div><div class="card-title">📝 特記事項・処置内容</div><div class="card-subtitle">不良箇所・処置・確認者</div></div>
-    <div class="card-chevron" id="chev4">▶</div>
-  </div><div class="card-body" id="body4">
     <div class="field"><label>不良箇所・特記事項</label>
       <textarea id="remarks" placeholder="発見した不良箇所、異音・異臭・漏れ等の詳細を記入してください" oninput="saveDraft();updateProgress()">${escHtml(d.remarks||'')}</textarea></div>
     <div class="field"><label>処置内容・対応状況</label>
@@ -534,15 +528,15 @@ function updateProgress() {
   const d = draft;
   let done = 0;
   if (d.date && d.site && d.machineName && d.inspector) done++;
-  const b1 = d.basicChecks  && d.basicChecks.length  && d.basicChecks.every(c=>c.status);
-  const b2 = d.safetyChecks && d.safetyChecks.length && d.safetyChecks.every(c=>c.status);
-  if (b1) done++; if (b2) done++;
+  const allChecks = [...(d.basicChecks||[]), ...(d.safetyChecks||[])];
+  const checksDone = allChecks.length && allChecks.every(c=>c.status);
+  if (checksDone) done++;
   if (d.remarks && d.remarks.trim()) done++;
   markCard(1, d.date&&d.site&&d.machineName&&d.inspector);
-  markCard(2, b1); markCard(3, b2);
-  markCard(4, d.remarks&&d.remarks.trim());
-  el('progressFill').style.width = Math.round(done/4*100)+'%';
-  el('progressLabel').textContent = `${done} / 4 セクション完了`;
+  markCard(2, checksDone);
+  markCard(3, d.remarks&&d.remarks.trim());
+  el('progressFill').style.width = Math.round(done/3*100)+'%';
+  el('progressLabel').textContent = `${done} / 3 セクション完了`;
   el('btnSave').disabled = !(d.date && d.site && d.machineName && d.inspector);
 }
 function markCard(n, ok) { const e=el('num'+n); if(e) e.className='card-num'+(ok?' done':''); }
@@ -604,7 +598,7 @@ function saveSettings() {
    PREVIEW & PRINT
    ============================================================ */
 function buildFullPrintHTML(r) {
-  const header = `<div class="print-header"><div class="print-logo">機械点検</div><div class="print-h-title">機械点検簿</div></div>`;
+  const header = `<div class="print-header"><div class="print-logo">機械等点検</div><div class="print-h-title">機械等点検簿</div></div>`;
   return `<div class="print-page">${header}${previewHTML(r)}</div>`;
 }
 

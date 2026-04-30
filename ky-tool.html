@@ -113,8 +113,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
 .btn-submit{width:100%;background:linear-gradient(135deg,var(--yellow),var(--orange));color:var(--dark);border:none;border-radius:16px;padding:18px;font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:0.05em;box-shadow:0 4px 20px rgba(255,107,0,.4);margin-bottom:8px;transition:transform 0.1s;}
 .btn-submit:active{transform:scale(0.98);}
 .btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-.btn-reset{width:100%;background:transparent;border:2px solid #555;border-radius:16px;padding:14px;font-size:14px;font-weight:700;color:#aaa;cursor:pointer;font-family:inherit;margin-bottom:8px;}
-.btn-danger{width:100%;background:transparent;border:2px solid var(--red);border-radius:16px;padding:12px;font-size:13px;font-weight:700;color:var(--red);cursor:pointer;font-family:inherit;margin-bottom:8px;opacity:0.7;}
+.btn-reset{width:100%;background:transparent;border:2px solid #555;border-radius:16px;padding:14px;font-size:14px;font-weight:700;color:#aaa;cursor:pointer;font-family:inherit;margin-bottom:8px;}.btn-danger{width:100%;background:transparent;border:2px solid var(--red);border-radius:16px;padding:12px;font-size:13px;font-weight:700;color:var(--red);cursor:pointer;font-family:inherit;margin-bottom:8px;opacity:0.7;}
 
 /* PREVIEW */
 #preview-panel{display:none;background:#fff;border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.2);}
@@ -364,6 +363,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
     </div>
   </div>
 
+  <button class="btn-submit" id="btnPreviewKy" onclick="toggleKyPreview()">👁️ プレビュー・印刷</button>
   <button class="btn-submit" id="submitBtn" onclick="submitForm()">✅ KY記録を完成・保存</button>
   <button class="btn-reset" onclick="resetToday()">🔄 今日の入力をリセット</button>
   <button class="btn-danger" onclick="clearLocalData()">🗑️ ローカルデータを消去</button>
@@ -941,7 +941,7 @@ function save(){
 function loadForm(){
   let data; try{data=JSON.parse(localStorage.getItem('ky_form'));}catch(e){}
   if(!data){ document.getElementById('workDate').value=todayStr(); return; }
-  document.getElementById('workDate').value=data.workDate||todayStr();
+  document.getElementById('workDate').value=todayStr();
   document.getElementById('weather').value=data.weather||'';
   document.getElementById('workDetail').value=data.workDetail||'';
   document.getElementById('safetyGoal').value=data.safetyGoal||'';
@@ -1013,6 +1013,13 @@ async function submitForm(){
   try{
     await db.collection('kyRecords').doc(recordId).set(record);
     _editingId=recordId;
+    // インデックス表示用にlocalStorageにもキャッシュ
+    try{
+      const cached=JSON.parse(localStorage.getItem('ky_records'))||[];
+      const idx=cached.findIndex(r=>r.id===recordId);
+      if(idx>=0) cached[idx]=record; else cached.push(record);
+      localStorage.setItem('ky_records', JSON.stringify(cached));
+    }catch(e){}
     buildPreview();
     document.getElementById('preview-panel').style.display='block';
     showToast('✅ KY記録を保存しました！');
@@ -1023,6 +1030,20 @@ async function submitForm(){
     console.error(e);
   } finally{
     btn.disabled=false; btn.textContent='✅ KY記録を完成・保存';
+  }
+}
+
+// ===== プレビュー・印刷トグル =====
+function toggleKyPreview(){
+  const p = document.getElementById('preview-panel');
+  const btn = document.getElementById('btnPreviewKy');
+  if (p.style.display === 'block') {
+    window.print();
+  } else {
+    buildPreview();
+    p.style.display = 'block';
+    btn.textContent = '🖨️ 印刷する';
+    p.scrollIntoView({behavior:'smooth'});
   }
 }
 

@@ -325,7 +325,7 @@ async function load() {
 
   // ドラフトはlocalStorageのみ（端末固有）
   draft = JSON.parse(localStorage.getItem(SK.d)) || newDraft();
-  if (!draft.date) draft.date = today();
+  draft.date = today();
   syncChecks(draft, settings);
 }
 
@@ -669,6 +669,10 @@ function setFilterMonth() {
 }
 
 function renderList() {
+  const savedMonth  = el('filterMonth')  ? el('filterMonth').value  : '';
+  const savedSite   = el('filterSite')   ? el('filterSite').value   : '';
+  const savedResult = el('filterResult') ? el('filterResult').value : '';
+
   el('listFilter').innerHTML = `
     <input type="month" id="filterMonth" onchange="renderList()">
     <select id="filterSite" onchange="renderList()"><option value="">すべての現場</option>${settings.sites.map(s=>`<option>${escHtml(s)}</option>`).join('')}</select>
@@ -680,11 +684,15 @@ function renderList() {
     </select>
     <button class="btn-batch" onclick="printAllFiltered()">📄 一括印刷</button>`;
   setFilterMonth();
-  const month  = el('filterMonth')  ? el('filterMonth').value  : '';
-  const site   = el('filterSite')   ? el('filterSite').value   : '';
-  const result = el('filterResult') ? el('filterResult').value : '';
+  if (savedMonth)  el('filterMonth').value  = savedMonth;
+  if (savedSite)   el('filterSite').value   = savedSite;
+  if (savedResult) el('filterResult').value = savedResult;
 
-  let recs = records.filter(r => {
+  const month  = el('filterMonth').value;
+  const site   = el('filterSite').value;
+  const result = el('filterResult').value;
+
+  let recs = [...records].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).filter(r => {
     if (month && !r.date.startsWith(month)) return false;
     if (site  && r.site!==site) return false;
     if (result) {

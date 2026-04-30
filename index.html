@@ -39,6 +39,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100
 .tool-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5;}
 .tool-badge{font-size:10px;font-weight:700;background:var(--bg);color:var(--sub);padding:3px 10px;border-radius:10px;margin-top:6px;display:inline-block;}
 .tool-badge.active{background:#E8F5E9;color:var(--green);}
+.tool-badge.warning{background:#FFF3E0;color:var(--orange);}
 .tool-arrow{font-size:20px;color:#ccc;flex-shrink:0;}
 
 /* CHECKLIST SECTION */
@@ -103,11 +104,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100
       <div class="tool-arrow">▶</div>
     </div>
     <div class="tool-card-footer" id="kyFooter" style="display:none">
-      <span class="footer-stat"><span class="footer-dot green"></span><span id="kyStatOk">0</span>件 良好</span>
-      <span class="footer-stat"><span class="footer-dot orange"></span><span id="kyStatMid">0</span>件 中リスク</span>
-      <span class="footer-stat"><span class="footer-dot red"></span><span id="kyStatHigh">0</span>件 高リスク</span>
-      <span class="footer-sep"></span>
-      <span class="footer-count">直近7日</span>
+      <span id="kyTodayStatus" style="font-size:13px;font-weight:700;"></span>
     </div>
   </a>
 
@@ -123,11 +120,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100
       <div class="tool-arrow">▶</div>
     </div>
     <div class="tool-card-footer" id="genbaFooter" style="display:none">
-      <span class="footer-stat"><span class="footer-dot green"></span><span id="genbaStatOk">0</span>件 問題なし</span>
-      <span class="footer-stat"><span class="footer-dot orange"></span><span id="genbaStatCau">0</span>件 要注意</span>
-      <span class="footer-stat"><span class="footer-dot red"></span><span id="genbaStatNg">0</span>件 不良</span>
-      <span class="footer-sep"></span>
-      <span class="footer-count">直近7日</span>
+      <span id="genbaTodayStatus" style="font-size:13px;font-weight:700;"></span>
     </div>
   </a>
 
@@ -143,11 +136,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100
       <div class="tool-arrow">▶</div>
     </div>
     <div class="tool-card-footer" id="kikaiFooter" style="display:none">
-      <span class="footer-stat"><span class="footer-dot green"></span><span id="kikaiStatOk">0</span>件 問題なし</span>
-      <span class="footer-stat"><span class="footer-dot orange"></span><span id="kikaiStatCau">0</span>件 要注意</span>
-      <span class="footer-stat"><span class="footer-dot red"></span><span id="kikaiStatNg">0</span>件 不良</span>
-      <span class="footer-sep"></span>
-      <span class="footer-count">直近7日</span>
+      <span id="kikaiTodayStatus" style="font-size:13px;font-weight:700;"></span>
     </div>
   </a>
 
@@ -209,99 +198,45 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);min-height:100
 <div class="toast" id="toast"></div>
 
 <script>
-/* 各ツールの記録数をlocalStorageから読み込んで表示 */
+/* 各ツールの本日入力状況をlocalStorageから読み込んで表示 */
 function loadStats() {
   const now = new Date();
-  const sevenDaysAgo = new Date(now - 7*24*60*60*1000);
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
-  function countRecent(key) {
-    try {
-      const recs = JSON.parse(localStorage.getItem(key)) || [];
-      return recs.filter(r => {
-        if (!r.date) return false;
-        return new Date(r.date + 'T00:00:00') >= sevenDaysAgo;
-      });
-    } catch(e) { return []; }
+  function getRecords(key) {
+    try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
+  }
+  function setTodayStatus(badgeId, footerId, statusId, hasToday) {
+    const badge = document.getElementById(badgeId);
+    const status = document.getElementById(statusId);
+    if (hasToday) {
+      badge.textContent = '✅ 本日入力あり';
+      badge.className = 'tool-badge active';
+      status.textContent = '✅ 本日入力あり';
+      status.style.color = 'var(--green)';
+    } else {
+      badge.textContent = '⚠️ 本日未入力';
+      badge.className = 'tool-badge warning';
+      status.textContent = '⚠️ 本日未入力';
+      status.style.color = 'var(--orange)';
+    }
+    document.getElementById(footerId).style.display = 'flex';
   }
 
-  // KY Records
-  const kyRecs = countRecent('ky_records');
-  const kyBadge = document.getElementById('kyBadge');
-  if (kyRecs.length > 0) {
-    kyBadge.textContent = `📊 ${kyRecs.length}件の記録（直近7日）`;
-    kyBadge.className = 'tool-badge active';
-    let ok=0, mid=0, high=0;
-    kyRecs.forEach(r => {
-      (r.risks||[]).forEach(ri => {
-        if (ri.level==='high') high++;
-        else if (ri.level==='mid') mid++;
-        else ok++;
-      });
-    });
-    document.getElementById('kyStatOk').textContent = ok;
-    document.getElementById('kyStatMid').textContent = mid;
-    document.getElementById('kyStatHigh').textContent = high;
-    document.getElementById('kyFooter').style.display = 'flex';
-  } else {
-    kyBadge.textContent = '記録なし';
-    kyBadge.className = 'tool-badge';
-  }
+  // KY Records（workDateフィールドを使用）
+  const kyRecs = getRecords('ky_records');
+  const kyToday = kyRecs.some(r => (r.workDate||r.date||'').startsWith(todayStr));
+  setTodayStatus('kyBadge', 'kyFooter', 'kyTodayStatus', kyToday);
 
-  // Genba Records (standalone)
-  const genbaRecs = countRecent('genba_records');
-  const genbaBadge = document.getElementById('genbaBadge');
-  if (genbaRecs.length > 0) {
-    genbaBadge.textContent = `📊 ${genbaRecs.length}件の記録（直近7日）`;
-    genbaBadge.className = 'tool-badge active';
-    let ok=0, cau=0, ng=0;
-    genbaRecs.forEach(r => {
-      [...(r.safetyChecks||[]), ...(r.envChecks||[])].forEach(c => {
-        const w = worstOf(c.amStatus, c.pmStatus);
-        if (w==='ng') ng++;
-        else if (w==='caution') cau++;
-        else if (w) ok++;
-      });
-    });
-    document.getElementById('genbaStatOk').textContent = ok;
-    document.getElementById('genbaStatCau').textContent = cau;
-    document.getElementById('genbaStatNg').textContent = ng;
-    document.getElementById('genbaFooter').style.display = 'flex';
-  } else {
-    genbaBadge.textContent = '記録なし';
-    genbaBadge.className = 'tool-badge';
-  }
+  // 現場点検簿
+  const genbaRecs = getRecords('genba_records');
+  const genbaToday = genbaRecs.some(r => (r.date||'').startsWith(todayStr));
+  setTodayStatus('genbaBadge', 'genbaFooter', 'genbaTodayStatus', genbaToday);
 
-  // Kikai Records (standalone)
-  const kikaiRecs = countRecent('kikai_records');
-  const kikaiBadge = document.getElementById('kikaiHBadge');
-  if (kikaiRecs.length > 0) {
-    kikaiBadge.textContent = `📊 ${kikaiRecs.length}件の記録（直近7日）`;
-    kikaiBadge.className = 'tool-badge active';
-    let ok=0, cau=0, ng=0;
-    kikaiRecs.forEach(r => {
-      [...(r.basicChecks||[]), ...(r.safetyChecks||[])].forEach(c => {
-        if (c.status==='ng') ng++;
-        else if (c.status==='caution') cau++;
-        else if (c.status) ok++;
-      });
-    });
-    document.getElementById('kikaiStatOk').textContent = ok;
-    document.getElementById('kikaiStatCau').textContent = cau;
-    document.getElementById('kikaiStatNg').textContent = ng;
-    document.getElementById('kikaiFooter').style.display = 'flex';
-  } else {
-    kikaiBadge.textContent = '記録なし';
-    kikaiBadge.className = 'tool-badge';
-  }
-}
-
-function worstOf(a, b) {
-  const s = [a,b].filter(Boolean);
-  if (s.includes('ng'))      return 'ng';
-  if (s.includes('caution')) return 'caution';
-  if (s.includes('ok'))      return 'ok';
-  if (s.includes('na'))      return 'na';
-  return null;
+  // 機械等点検簿
+  const kikaiRecs = getRecords('kikai_records');
+  const kikaiToday = kikaiRecs.some(r => (r.date||'').startsWith(todayStr));
+  setTodayStatus('kikaiHBadge', 'kikaiFooter', 'kikaiTodayStatus', kikaiToday);
 }
 
 document.addEventListener('DOMContentLoaded', loadStats);

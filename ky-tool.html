@@ -959,7 +959,7 @@ function loadForm(){
   riskCount=data.riskCount||0; renderRisks();
   updateProgress();
 }
-function todayStr(){ return new Date().toISOString().split('T')[0]; }
+function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
 // ===== 進捗バー =====
 function updateProgress(){
@@ -1024,7 +1024,6 @@ async function submitForm(){
     document.getElementById('preview-panel').style.display='block';
     showToast('✅ KY記録を保存しました！');
     document.getElementById('preview-panel').scrollIntoView({behavior:'smooth'});
-    setTimeout(()=>{ if(confirm('KY記録票を印刷・保存しますか？')) window.print(); }, 400);
   } catch(e){
     showToast('⚠️ 保存に失敗しました。通信状態を確認してください。');
     console.error(e);

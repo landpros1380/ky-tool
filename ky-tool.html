@@ -420,6 +420,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.6;}
     </div>
   </div>
 
+  <!-- 作業員 -->
+  <div class="settings-section">
+    <div class="settings-section-header">
+      <span class="s-icon">👷</span>
+      <h2>作業員の編集</h2>
+    </div>
+    <div class="settings-section-body">
+      <div class="settings-item-list" id="workerList"></div>
+      <div class="settings-add-row">
+        <input type="text" id="workerSettingInput" placeholder="新しい作業員名を入力" onkeydown="if(event.key==='Enter')addWorkerSetting()">
+        <button class="btn-settings-add" onclick="addWorkerSetting()">+</button>
+      </div>
+      <p class="settings-hint">▲▼ボタンで順番を変更、×ボタンで削除できます</p>
+    </div>
+  </div>
+
   <!-- 現場名 -->
   <div class="settings-section">
     <div class="settings-section-header">
@@ -583,7 +599,7 @@ function showPage(p){
     document.getElementById('tab-'+t+'-btn').classList.toggle('active-tab', t===p);
   });
   if(p==='list'){ renderList(); updateSummary(); }
-  if(p==='settings'){ renderSiteSettings(); renderWorkTypeSettings(); renderEquipSettings(); updateFbStatus(); }
+  if(p==='settings'){ renderWorkerSettings(); renderSiteSettings(); renderWorkTypeSettings(); renderEquipSettings(); updateFbStatus(); }
 }
 
 // ===== カード開閉 =====
@@ -617,7 +633,7 @@ async function loadAll(){
   }
   rebuildSiteSelect(); rebuildLeaderSelect(); rebuildWorkerSelect();
   rebuildWorkTypeSelect(); rebuildEquipSelect();
-  renderSiteSettings(); renderWorkTypeSettings(); renderEquipSettings();
+  renderWorkerSettings(); renderSiteSettings(); renderWorkTypeSettings(); renderEquipSettings();
 }
 
 function _loadLocal(){
@@ -829,6 +845,37 @@ function renderRisks(){
     list.appendChild(div);
     _renderScoreBadge(r);
   });
+}
+
+// ===== 設定：作業員 =====
+function renderWorkerSettings(){
+  const list=document.getElementById('workerList'); if(!list) return; list.innerHTML='';
+  if(workers.length===0){
+    list.innerHTML='<div style="color:var(--sub);font-size:13px;padding:8px 0">作業員が登録されていません</div>';
+    return;
+  }
+  workers.forEach((w,i)=>{
+    const row=document.createElement('div'); row.className='settings-item';
+    row.innerHTML=`<div class="item-order"><button class="btn-item-up" onclick="moveWorker(${i},-1)" ${i===0?'disabled':''}>▲</button><button class="btn-item-down" onclick="moveWorker(${i},1)" ${i===workers.length-1?'disabled':''}>▼</button></div><span>${w}</span><button class="btn-item-del" onclick="delWorker(${i})">×</button>`;
+    list.appendChild(row);
+  });
+}
+function addWorkerSetting(){
+  const input=document.getElementById('workerSettingInput'); const val=input.value.trim();
+  if(!val){showToast('⚠️ 作業員名を入力してください');return;}
+  if(workers.includes(val)){showToast('すでに登録されています');return;}
+  workers.push(val); saveMasters(); rebuildLeaderSelect(); rebuildWorkerSelect(); renderWorkerSettings();
+  input.value=''; showToast('✅ 追加しました');
+}
+function moveWorker(i,dir){
+  const j=i+dir; if(j<0||j>=workers.length) return;
+  [workers[i],workers[j]]=[workers[j],workers[i]];
+  saveMasters(); rebuildLeaderSelect(); rebuildWorkerSelect(); renderWorkerSettings();
+}
+function delWorker(i){
+  if(!confirm(`「${workers[i]}」を削除しますか？`)) return;
+  workers.splice(i,1); saveMasters(); rebuildLeaderSelect(); rebuildWorkerSelect(); renderWorkerSettings();
+  showToast('🗑️ 削除しました');
 }
 
 // ===== 設定：現場名 =====
